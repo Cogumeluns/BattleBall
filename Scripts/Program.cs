@@ -1,2 +1,2 @@
-﻿using var game = new BattleBall.Game1();
+﻿using var game = new BattleBall.GameMain();
 game.Run();
