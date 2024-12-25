@@ -12,7 +12,9 @@ namespace BattleBall.Scripts.Entities
 {
     public class _Field : ICollisionActor, IUpdateDrawable
     {
+        private int distance = 5;
         public IShapeF Bounds { get; set; }
+        public bool isDisposed { get; private set; } = false;
         public Color color;
         public float thickness;
         bool isColliderPlayer;
@@ -94,20 +96,20 @@ namespace BattleBall.Scripts.Entities
 
                 if (isTop)
                 {
-                    ball.Bounds.Position = new Vector2(ball.Bounds.Position.X, Bounds.BoundingRectangle.Top + ball.radius + thickness);
+                    ball.Bounds.Position = new Vector2(ball.Bounds.Position.X, Bounds.BoundingRectangle.Top + ball.radius + thickness + distance);
                 }
                 else if (isBottom)
                 {
-                    ball.Bounds.Position = new Vector2(ball.Bounds.Position.X, Bounds.BoundingRectangle.Bottom - ball.radius - thickness);
+                    ball.Bounds.Position = new Vector2(ball.Bounds.Position.X, Bounds.BoundingRectangle.Bottom - ball.radius - thickness - distance);
                 }
 
                 if (isLeft)
                 {
-                    ball.Bounds.Position = new Vector2(Bounds.BoundingRectangle.Left + ball.radius + thickness, ball.Bounds.Position.Y);
+                    ball.Bounds.Position = new Vector2(Bounds.BoundingRectangle.Left + ball.radius + thickness + distance, ball.Bounds.Position.Y);
                 }
                 else if (isRight)
                 {
-                    ball.Bounds.Position = new Vector2(Bounds.BoundingRectangle.Right - ball.radius - thickness, ball.Bounds.Position.Y);
+                    ball.Bounds.Position = new Vector2(Bounds.BoundingRectangle.Right - ball.radius - thickness - distance, ball.Bounds.Position.Y);
                 }
             }
         }
@@ -187,6 +189,11 @@ namespace BattleBall.Scripts.Entities
                     player.timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
         }
     }
 }

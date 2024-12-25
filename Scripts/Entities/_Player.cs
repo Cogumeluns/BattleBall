@@ -17,7 +17,7 @@ namespace BattleBall.Scripts.Entities
     {
         public IShapeF Bounds { get; set; }
         public int Lives { get; set; }
-
+        public bool isDisposed { get; private set; } = false;
         public float radius;
         public Color color;
         private Dictionary<PlayerKeys, Keys> playerKeys = new();
@@ -173,8 +173,9 @@ namespace BattleBall.Scripts.Entities
             }
         }
 
-        public void Death()
+        public void Dispose()
         {
+            isDisposed = true;
         }
     }
 }

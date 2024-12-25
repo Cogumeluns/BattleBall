@@ -14,11 +14,12 @@ namespace BattleBall.Scripts.Entities
     public class _BallLIght : ICollisionActor, IUpdateDrawable
     {
         public IShapeF Bounds { get; set; }
+        public bool isDisposed { get; private set; }
         public float radius;
         public Color color;
-
         public List<IDeath> players = new();
         InstantiateBallLight instantiateBallLight;
+        int damage = 1;
 
         public _BallLIght(CircleF circle, Color color, List<IDeath> players, InstantiateBallLight instantiateBallLight)
         {
@@ -41,24 +42,29 @@ namespace BattleBall.Scripts.Entities
         {
             if (collisionInfo.Other is _Ball ball)
             {
-                if (ball.color == Color.Red)
+                instantiateBallLight.DestroyBallLight();
+                if (ball.color == Color.Blue && damage == 1)
                 {
-                    if (--players[0].Lives <= 0)
-                    {
-                        players[0].Death();
-                    }
-                }
-
-                if (ball.color == Color.Blue)
-                {
+                    damage = 0;
                     if (--players[1].Lives <= 0)
                     {
-                        players[1].Death();
+                        ((IBaseDisposable)players[1]).Dispose();
                     }
                 }
-
-                instantiateBallLight.DestroyBallLight();
+                else if (ball.color == Color.Red && damage == 1)
+                {
+                    damage = 0;
+                    if (--players[0].Lives <= 0)
+                    {
+                        ((IBaseDisposable)players[0]).Dispose();
+                    }
+                }
             }
+        }
+
+        public void Dispose()
+        {
+            isDisposed = true;
         }
     }
 }

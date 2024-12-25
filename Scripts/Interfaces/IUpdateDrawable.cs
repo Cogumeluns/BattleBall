@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BattleBall.Scripts.Interfaces
 {
-    public interface IUpdateDrawable
+    public interface IUpdateDrawable : IBaseDisposable
     {
         void Update(GameTime gameTime);
         void Draw(SpriteBatch spriteBatch);

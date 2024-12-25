@@ -15,6 +15,7 @@ namespace BattleBall.Scripts.Entities
     {
         const float DEFAULT_DECRESS_VELOCITY_BALL = 0.4f;
         public IShapeF Bounds { get; set; }
+        public bool isDisposed { get; private set; } = false;
         public float radius;
         public Color color;
 
@@ -105,6 +106,11 @@ namespace BattleBall.Scripts.Entities
                 velocity = Physics.DEFAULT_PUSH_BACK_INTENSITY * someIntensity * direction;
                 color = player.color;
             }
+        }
+
+        public void Dispose()
+        {
+            isDisposed = true;
         }
     }
 }

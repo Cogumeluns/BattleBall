@@ -8,7 +8,5 @@ namespace BattleBall.Scripts.Interfaces
     public interface IDeath
     {
         public int Lives { get; set; }
-
-        public void Death();
     }
 }

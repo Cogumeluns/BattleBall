@@ -20,7 +20,6 @@ public class GameMain : Game
 
     List<IUpdateDrawable> updateDrawables = new();
     List<IUpdateDrawable> tempUpdateDrawables = new();
-    List<IUpdateDrawable> tempRemoveUpdateDrawables = new();
 
     _Player player1;
     _Player player2;
@@ -51,9 +50,9 @@ public class GameMain : Game
 
         field = new(new(new(50, 50), new(GameBounds.X - 100, GameBounds.Y - 100)), Color.White);
 
-        ball = new(new(new(GameBounds.X / 2, GameBounds.Y / 2), 10), Color.White);
+        ball = new(new(new(GameBounds.X / 2, GameBounds.Y / 2 + 250), 10), Color.White);
 
-        instantiateBallLight = new(_collisionComponent, tempUpdateDrawables, tempRemoveUpdateDrawables, field, player1, player2);
+        instantiateBallLight = new(_collisionComponent, tempUpdateDrawables, field, player1, player2);
 
         _collisionComponent.Insert(player1);
         _collisionComponent.Insert(player2);
@@ -80,10 +79,21 @@ public class GameMain : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        if (tempRemoveUpdateDrawables.Count != 0)
+        if (updateDrawables.Count != 0)
         {
-            tempRemoveUpdateDrawables.ForEach(x => updateDrawables.Remove(x));
-            tempRemoveUpdateDrawables.Clear();
+            for (int i = 0; i < updateDrawables.Count; i++)
+            {
+                IBaseDisposable baseDisposable = updateDrawables[i];
+                if (baseDisposable.isDisposed)
+                {
+                    if (updateDrawables[i] is ICollisionActor actor)
+                    {
+                        _collisionComponent.Remove(actor);
+                    }
+
+                    updateDrawables.RemoveAt(i);
+                }
+            }
         }
 
         if (tempUpdateDrawables.Count != 0)
