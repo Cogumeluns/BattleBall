@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
+
 using BattleBall.Scripts.Constantes;
 using BattleBall.Scripts.Interfaces;
 using Microsoft.Xna.Framework;
@@ -17,13 +12,14 @@ namespace BattleBall.Scripts.Entities
     {
         public IShapeF Bounds { get; set; }
         public Color color;
-
+        public float thickness;
         bool isColliderPlayer;
 
         public _Field(RectangleF rectangle, Color color)
         {
             Bounds = rectangle;
             this.color = color;
+            thickness = 5;
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -53,60 +49,88 @@ namespace BattleBall.Scripts.Entities
 
                 if (isColliderPlayer)
                 {
-                    if (player.isborder[0])
-                    {
-                        if (player.velocitydash.Y < 0)
-                        {
-                            player.velocitydash.Y = Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                            player.timeDash = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                        }
-                        if (player.pushBackIntensity.Y < 0)
-                        {
-                            player.pushBackIntensity.Y = Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                            player.timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                        }
-                    }
-                    else if (player.isborder[1])
-                    {
-                        if (player.velocitydash.Y > 0)
-                        {
-                            player.velocitydash.Y = -Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                            player.timeDash = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                        }
-                        if (player.pushBackIntensity.Y > 0)
-                        {
-                            player.pushBackIntensity.Y = -Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                            player.timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                        }
-                    }
-                    if (player.isborder[2])
-                    {
-                        if (player.velocitydash.X < 0)
-                        {
-                            player.velocitydash.X = Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                            player.timeDash = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                        }
-                        if (player.pushBackIntensity.X < 0)
-                        {
-                            player.pushBackIntensity.X = Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                            player.timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                        }
-                    }
-                    else if (player.isborder[3])
-                    {
-                        if (player.velocitydash.X > 0)
-                        {
-                            player.velocitydash.X = -Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                            player.timeDash = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                        }
-                        if (player.pushBackIntensity.X > 0)
-                        {
-                            player.pushBackIntensity.X = -Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                            player.timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                        }
-                    }
+                    AdjustePosition(player);
+                    InversePhysics(player);
+                }
+            }
+        }
+
+        void AdjustePosition(_Player player)
+        {
+            if (player.isborder[0])
+            {
+                player.Bounds.Position = new Vector2(player.Bounds.Position.X, Bounds.BoundingRectangle.Top + player.radius + thickness);
+            }
+            else if (player.isborder[1])
+            {
+                player.Bounds.Position = new Vector2(player.Bounds.Position.X, Bounds.BoundingRectangle.Bottom - player.radius - thickness);
+            }
+
+            if (player.isborder[2])
+            {
+                player.Bounds.Position = new Vector2(Bounds.BoundingRectangle.Left + player.radius + thickness, player.Bounds.Position.Y);
+            }
+            else if (player.isborder[3])
+            {
+                player.Bounds.Position = new Vector2(Bounds.BoundingRectangle.Right - player.radius - thickness, player.Bounds.Position.Y);
+            }
+        }
+
+        void InversePhysics(_Player player)
+        {
+            if (player.isborder[0])
+            {
+                if (player.velocitydash.Y < 0)
+                {
+                    player.velocitydash.Y = Physics.DEFAULT_PUSH_BACK_INTENSITY;
+                    player.timeDash = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
+                }
+                if (player.pushBackIntensity.Y < 0)
+                {
+                    player.pushBackIntensity.Y = Physics.DEFAULT_PUSH_BACK_INTENSITY;
+                    player.timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
+                }
+            }
+            else if (player.isborder[1])
+            {
+                if (player.velocitydash.Y > 0)
+                {
+                    player.velocitydash.Y = -Physics.DEFAULT_PUSH_BACK_INTENSITY;
+                    player.timeDash = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
+                }
+                if (player.pushBackIntensity.Y > 0)
+                {
+                    player.pushBackIntensity.Y = -Physics.DEFAULT_PUSH_BACK_INTENSITY;
+                    player.timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
+                }
+            }
+            if (player.isborder[2])
+            {
+                if (player.velocitydash.X < 0)
+                {
+                    player.velocitydash.X = Physics.DEFAULT_PUSH_BACK_INTENSITY;
+                    player.timeDash = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
+                }
+                if (player.pushBackIntensity.X < 0)
+                {
+                    player.pushBackIntensity.X = Physics.DEFAULT_PUSH_BACK_INTENSITY;
+                    player.timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
+                }
+            }
+            else if (player.isborder[3])
+            {
+                if (player.velocitydash.X > 0)
+                {
+                    player.velocitydash.X = -Physics.DEFAULT_PUSH_BACK_INTENSITY;
+                    player.timeDash = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
+                }
+                if (player.pushBackIntensity.X > 0)
+                {
+                    player.pushBackIntensity.X = -Physics.DEFAULT_PUSH_BACK_INTENSITY;
+                    player.timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
                 }
             }
         }
     }
 }
+
