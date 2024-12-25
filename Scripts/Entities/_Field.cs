@@ -1,4 +1,6 @@
 
+using System;
+using System.Collections.Generic;
 using BattleBall.Scripts.Constantes;
 using BattleBall.Scripts.Interfaces;
 using Microsoft.Xna.Framework;
@@ -51,6 +53,61 @@ namespace BattleBall.Scripts.Entities
                 {
                     AdjustePosition(player);
                     InversePhysics(player);
+                }
+            }
+
+            if (collisionInfo.Other is _Ball ball)
+            {
+                float distanceToTop = Bounds.BoundingRectangle.Top - ball.Bounds.BoundingRectangle.Top;
+                float distanceToBottom = Bounds.BoundingRectangle.Bottom - ball.Bounds.BoundingRectangle.Bottom;
+                float distanceToLeft = Bounds.BoundingRectangle.Left - ball.Bounds.BoundingRectangle.Left;
+                float distanceToRight = Bounds.BoundingRectangle.Right - ball.Bounds.BoundingRectangle.Right;
+
+                bool isTop = distanceToTop > 0;
+                bool isBottom = distanceToBottom < 0;
+                bool isLeft = distanceToLeft > 0;
+                bool isRight = distanceToRight < 0;
+
+
+
+                if (isTop && ball.velocity.Y < 0)
+                {
+                    ball.velocity.Y = -ball.velocity.Y;
+                    ball.velocityField.Y = Physics.DEFAULT_VELOCITY;
+                }
+                else if (isBottom && ball.velocity.Y > 0)
+                {
+                    ball.velocity.Y = -ball.velocity.Y;
+                    ball.velocityField.Y = -Physics.DEFAULT_VELOCITY;
+                }
+
+                if (isLeft && ball.velocity.X < 0)
+                {
+                    ball.velocity.X = -ball.velocity.X;
+                    ball.velocityField.X = Physics.DEFAULT_VELOCITY;
+                }
+                else if (isRight && ball.velocity.X > 0)
+                {
+                    ball.velocity.X = -ball.velocity.X;
+                    ball.velocityField.X = -Physics.DEFAULT_VELOCITY;
+                }
+
+                if (isTop)
+                {
+                    ball.Bounds.Position = new Vector2(ball.Bounds.Position.X, Bounds.BoundingRectangle.Top + ball.radius + thickness);
+                }
+                else if (isBottom)
+                {
+                    ball.Bounds.Position = new Vector2(ball.Bounds.Position.X, Bounds.BoundingRectangle.Bottom - ball.radius - thickness);
+                }
+
+                if (isLeft)
+                {
+                    ball.Bounds.Position = new Vector2(Bounds.BoundingRectangle.Left + ball.radius + thickness, ball.Bounds.Position.Y);
+                }
+                else if (isRight)
+                {
+                    ball.Bounds.Position = new Vector2(Bounds.BoundingRectangle.Right - ball.radius - thickness, ball.Bounds.Position.Y);
                 }
             }
         }

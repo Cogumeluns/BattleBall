@@ -13,12 +13,13 @@ using MonoGame.Extended.Collisions;
 
 namespace BattleBall.Scripts.Entities
 {
-    public class _Player : ICollisionActor, IUpdateDrawable
+    public class _Player : ICollisionActor, IUpdateDrawable, IDeath
     {
-        const int sides = 512;
         public IShapeF Bounds { get; set; }
+        public int Lives { get; set; }
+
         public float radius;
-        private Color color;
+        public Color color;
         private Dictionary<PlayerKeys, Keys> playerKeys = new();
         public Vector2 velocity = Vector2.Zero;
         public Vector2 velocitydash = Vector2.Zero;
@@ -34,6 +35,7 @@ namespace BattleBall.Scripts.Entities
             Bounds = circle;
             radius = circle.Radius;
             this.color = color;
+            Lives = 3;
         }
 
         public void SetKeys(Keys up, Keys down, Keys left, Keys right, Keys dash)
@@ -47,7 +49,7 @@ namespace BattleBall.Scripts.Entities
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawCircle((CircleF)Bounds, sides, color, radius);
+            spriteBatch.DrawCircle((CircleF)Bounds, Physics.SIDES, color, radius);
         }
 
         public void Update(GameTime gameTime)
@@ -169,6 +171,10 @@ namespace BattleBall.Scripts.Entities
                 pushBackIntensity = Physics.DEFAULT_PUSH_BACK_INTENSITY * someIntensity * direction;
                 timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
             }
+        }
+
+        public void Death()
+        {
         }
     }
 }
