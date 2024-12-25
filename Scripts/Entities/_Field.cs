@@ -60,10 +60,10 @@ namespace BattleBall.Scripts.Entities
 
             if (collisionInfo.Other is _Ball ball)
             {
-                float distanceToTop = Bounds.BoundingRectangle.Top - ball.Bounds.BoundingRectangle.Top;
-                float distanceToBottom = Bounds.BoundingRectangle.Bottom - ball.Bounds.BoundingRectangle.Bottom;
-                float distanceToLeft = Bounds.BoundingRectangle.Left - ball.Bounds.BoundingRectangle.Left;
-                float distanceToRight = Bounds.BoundingRectangle.Right - ball.Bounds.BoundingRectangle.Right;
+                float distanceToTop = Bounds.BoundingRectangle.Top + distance - ball.Bounds.BoundingRectangle.Top;
+                float distanceToBottom = Bounds.BoundingRectangle.Bottom - distance - ball.Bounds.BoundingRectangle.Bottom;
+                float distanceToLeft = Bounds.BoundingRectangle.Left + distance - ball.Bounds.BoundingRectangle.Left;
+                float distanceToRight = Bounds.BoundingRectangle.Right - distance - ball.Bounds.BoundingRectangle.Right;
 
                 bool isTop = distanceToTop > 0;
                 bool isBottom = distanceToBottom < 0;
@@ -75,23 +75,23 @@ namespace BattleBall.Scripts.Entities
                 if (isTop && ball.velocity.Y < 0)
                 {
                     ball.velocity.Y = -ball.velocity.Y;
-                    ball.velocityField.Y = Physics.DEFAULT_VELOCITY;
+                    ball.velocityField.Y = 200;
                 }
                 else if (isBottom && ball.velocity.Y > 0)
                 {
                     ball.velocity.Y = -ball.velocity.Y;
-                    ball.velocityField.Y = -Physics.DEFAULT_VELOCITY;
+                    ball.velocityField.Y = -200;
                 }
 
                 if (isLeft && ball.velocity.X < 0)
                 {
                     ball.velocity.X = -ball.velocity.X;
-                    ball.velocityField.X = Physics.DEFAULT_VELOCITY;
+                    ball.velocityField.X = 200;
                 }
                 else if (isRight && ball.velocity.X > 0)
                 {
                     ball.velocity.X = -ball.velocity.X;
-                    ball.velocityField.X = -Physics.DEFAULT_VELOCITY;
+                    ball.velocityField.X = -200;
                 }
 
                 if (isTop)

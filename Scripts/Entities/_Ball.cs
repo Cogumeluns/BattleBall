@@ -80,9 +80,10 @@ namespace BattleBall.Scripts.Entities
 
                 velocity = new Vector2(x * normalizedDirection.X, y * normalizedDirection.Y);
 
-                if (velocity.Length() < 0.01f)
+                if (velocity.Length() < 20f)
                 {
                     velocity = Vector2.Zero;
+                    velocityField = Vector2.Zero;
                     color = Color.White;
                 }
             }
