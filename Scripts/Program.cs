@@ -1,2 +1,2 @@
-﻿using var game = new BattleBall.GameMain();
+﻿using var game = new BattleBall.GamePhysicTest();
 game.Run();
