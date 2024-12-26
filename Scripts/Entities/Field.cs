@@ -11,7 +11,7 @@ using MonoGame.Extended.Collisions;
 
 namespace BattleBall.Scripts.Entities
 {
-    public class _Field : ICollisionActor, IUpdateDrawable
+    public class Field : ICollisionActor, IUpdateDrawable
     {
         private const int DISTANCE_TO_BOUND = 5;
         // ICollisionActor
@@ -20,9 +20,8 @@ namespace BattleBall.Scripts.Entities
         public bool isDisposed { get; private set; } = false;
         public Color color;
         public float thickness;
-        bool isColliderPlayer;
 
-        public _Field(RectangleF rectangle, Color color)
+        public Field(RectangleF rectangle, Color color)
         {
             Bounds = rectangle;
             this.color = color;
@@ -40,32 +39,38 @@ namespace BattleBall.Scripts.Entities
 
         public void OnCollision(CollisionEventArgs collisionInfo)
         {
-            if (collisionInfo.Other is _Player player)
+            if (collisionInfo.Other is Player player)
             {
                 HandlePlayerCollision(player);
             }
-            else if (collisionInfo.Other is _Ball ball)
+            else if (collisionInfo.Other is Ball ball)
             {
                 HandleBallCollision(ball);
             }
         }
 
-        void HandlePlayerCollision(_Player player)
+        void HandlePlayerCollision(Player player)
         {
             float[] distanceToBorder = GetDistanceToBorder(player.Bounds.BoundingRectangle);
             player.isColliderBorderField = IsCollidingWithBorder(distanceToBorder);
 
             if (IsCollided(player.isColliderBorderField))
             {
+                if (player.timePushBackDuration != 0)
+                {
+                    player.pushBackIntensity = Vector2.Zero;
+                    player.timePushBackDuration = 0;
+                }
+
                 player.Bounds.Position = AdjustPosition(player.Bounds.Position, player.isColliderBorderField, ((CircleF)player.Bounds).Radius);
                 player.velocity = InversePhysics(player.velocity, player.isColliderBorderField);
                 player.velocitydash = InversePhysics(player.velocitydash, player.isColliderBorderField);
 
-                UpdateForceDuration(player);
+                UpdatePushBackDuration(player);
             }
         }
 
-        void HandleBallCollision(_Ball ball)
+        void HandleBallCollision(Ball ball)
         {
             float[] distanceToBorder = GetDistanceToBorder(ball.Bounds.BoundingRectangle);
             bool[] colliderBorder = IsCollidingWithBorder(distanceToBorder);
@@ -78,7 +83,7 @@ namespace BattleBall.Scripts.Entities
             }
         }
 
-        void UpdateForceDuration(_Player player)
+        void UpdatePushBackDuration(Player player)
         {
             if (player.timeDash != 0 || player.timePushBackDuration != 0)
             {
@@ -95,11 +100,11 @@ namespace BattleBall.Scripts.Entities
         {
             return new[]
             {
-        distances[0] > 0,
-        distances[1] < 0,
-        distances[2] > 0,
-        distances[3] < 0
-    };
+                distances[0] > 0,
+                distances[1] < 0,
+                distances[2] > 0,
+                distances[3] < 0
+            };
         }
 
         float[] GetDistanceToBorder(RectangleF collider)
@@ -108,11 +113,11 @@ namespace BattleBall.Scripts.Entities
 
             return new[]
             {
-        rectangleField.Top + DISTANCE_TO_BOUND - collider.Top,
-        rectangleField.Bottom - DISTANCE_TO_BOUND - collider.Bottom,
-        rectangleField.Left + DISTANCE_TO_BOUND - collider.Left,
-        rectangleField.Right - DISTANCE_TO_BOUND - collider.Right
-    };
+                rectangleField.Top + DISTANCE_TO_BOUND - collider.Top,
+                rectangleField.Bottom - DISTANCE_TO_BOUND - collider.Bottom,
+                rectangleField.Left + DISTANCE_TO_BOUND - collider.Left,
+                rectangleField.Right - DISTANCE_TO_BOUND - collider.Right
+            };
         }
 
         Vector2 AdjustPosition(Vector2 position, bool[] bordersColliding, float radius)

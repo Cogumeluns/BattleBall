@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using BattleBall.Scripts.Constants;
 using BattleBall.Scripts.Enum;
 using BattleBall.Scripts.Interfaces;
-using BattleBall.Scripts.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -14,7 +13,7 @@ using MonoGame.Extended.Collisions;
 
 namespace BattleBall.Scripts.Entities
 {
-    public class _Player : ICollisionActor, IUpdateDrawable
+    public class Player : ICollisionActor, IUpdateDrawable
     {
         // ICollisionActor
         public IShapeF Bounds { get; set; }
@@ -30,11 +29,21 @@ namespace BattleBall.Scripts.Entities
         public float timePushBackDuration = 0;
         public bool[] isColliderBorderField = new bool[4]; // TOP, BOTTOM, LEFT, RIGHT
 
-        public _Player(CircleF circle, Color color)
+        public Player(CircleF circle, Color color)
         {
             Bounds = circle;
             this.color = color;
             Lives = 3;
+        }
+
+        public void Damage(int damage)
+        {
+            Lives -= damage;
+
+            if (Lives <= 0)
+            {
+                Dispose();
+            }
         }
 
         public void SetKeys(Keys up, Keys down, Keys left, Keys right, Keys dash)
@@ -182,11 +191,52 @@ namespace BattleBall.Scripts.Entities
         // ICollisionActor
         public void OnCollision(CollisionEventArgs collisionInfo)
         {
-            if (collisionInfo.Other is _Player player)
+            if (collisionInfo.Other is Player player)
             {
-                pushBackIntensity = PhysicForce.ApplyPushBack(Bounds.Position, player, Physics.DEFAULT_PUSH_BACK_INTENSITY_PLAYER);
+                pushBackIntensity = ApplyPushBack(Bounds.Position, player, Physics.DEFAULT_PUSH_BACK_INTENSITY_PLAYER);
                 timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
+
+                AdjustPosition(player);
             }
+        }
+
+        public Vector2 ApplyPushBack(Vector2 currentCollider, Player playerCollider, float force)
+        {
+            Vector2 direction = currentCollider - playerCollider.Bounds.Position;
+
+            direction.Normalize();
+
+            float someIntensity = 1;
+
+            if (playerCollider.timeDash != 0)
+            {
+                someIntensity = 1.5f;
+            }
+
+            return force * someIntensity * direction;
+        }
+
+        void AdjustPosition(Player player)
+        {
+            Vector2 overlapDirection = player.Bounds.Position - Bounds.Position;
+
+            if (overlapDirection != Vector2.Zero)
+            {
+                overlapDirection.Normalize();
+            }
+
+            float overlapDistance = CalculateOverlapDistance((CircleF)Bounds, (CircleF)player.Bounds);
+
+            player.Bounds.Position += overlapDirection * overlapDistance;
+        }
+
+        float CalculateOverlapDistance(CircleF bounds1, CircleF bounds2)
+        {
+            float distanceBetweenCenters = Vector2.Distance(bounds1.Position, bounds2.Position);
+
+            float combinedRadius = bounds1.Radius + bounds2.Radius;
+
+            return combinedRadius - distanceBetweenCenters;
         }
 
         public void Dispose()

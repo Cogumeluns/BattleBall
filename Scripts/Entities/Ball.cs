@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using BattleBall.Scripts.Constants;
 using BattleBall.Scripts.Interfaces;
-using BattleBall.Scripts.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -12,7 +11,7 @@ using MonoGame.Extended.Collisions;
 
 namespace BattleBall.Scripts.Entities
 {
-    public class _Ball : ICollisionActor, IUpdateDrawable
+    public class Ball : ICollisionActor, IUpdateDrawable
     {
         const float DEFAULT_DECRESS_VELOCITY_BALL = 0.4f;
         const float RADIUS = 3;
@@ -24,7 +23,7 @@ namespace BattleBall.Scripts.Entities
         public Vector2 velocity = Vector2.Zero;
         public Vector2 velocityField = Vector2.Zero;
 
-        public _Ball(CircleF circle, Color color)
+        public Ball(CircleF circle, Color color)
         {
             Bounds = circle;
             this.color = color;
@@ -41,11 +40,7 @@ namespace BattleBall.Scripts.Entities
 
             UpdateMovement(deltaTime);
             velocity = DecreaseVelocity(deltaTime, velocity, false);
-            if (velocityField != Vector2.Zero)
-            {
-                velocityField = DecreaseVelocity(deltaTime, velocityField, true);
-                System.Console.WriteLine(velocityField.ToString());
-            }
+            velocityField = DecreaseVelocity(deltaTime, velocityField, true);
         }
 
         void UpdateMovement(float deltaTime)
@@ -100,11 +95,27 @@ namespace BattleBall.Scripts.Entities
 
         public void OnCollision(CollisionEventArgs collisionInfo)
         {
-            if (collisionInfo.Other is _Player player)
+            if (collisionInfo.Other is Player player)
             {
-                velocity = PhysicForce.ApplyPushBack(Bounds.Position, player, Physics.DEFAULT_PUSH_BACK_INTENSITY_BALL);
+                velocity = ApplyPushBack(Bounds.Position, player, Physics.DEFAULT_PUSH_BACK_INTENSITY_BALL);
                 color = player.color;
             }
+        }
+
+        public static Vector2 ApplyPushBack(Vector2 currentCollider, Player playerCollider, float force)
+        {
+            Vector2 direction = currentCollider - playerCollider.Bounds.Position;
+
+            direction.Normalize();
+
+            float someIntensity = 1;
+
+            if (playerCollider.timeDash != 0)
+            {
+                someIntensity = 1.5f;
+            }
+
+            return force * someIntensity * direction;
         }
 
         public void Dispose()
