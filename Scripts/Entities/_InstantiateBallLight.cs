@@ -15,14 +15,14 @@ namespace BattleBall.Scripts.Entities
         CollisionComponent _collisionComponent;
         List<IUpdateDrawable> _updateDrawables;
 
-        List<IDeath> _players = new();
+        List<_Player> _players = new();
         _Field _field = null;
 
         _BallLIght _BallLIght = null;
         public bool _isExecute = false;
 
         public InstantiateBallLight(CollisionComponent collisionComponent, List<IUpdateDrawable> updateDrawables,
-        _Field field, IDeath p1, IDeath p2)
+        _Field field, _Player p1, _Player p2)
         {
             _collisionComponent = collisionComponent;
             _updateDrawables = updateDrawables;

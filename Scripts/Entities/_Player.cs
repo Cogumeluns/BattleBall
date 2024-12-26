@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BattleBall.Scripts.Constantes;
+using BattleBall.Scripts.Constants;
 using BattleBall.Scripts.Enum;
 using BattleBall.Scripts.Interfaces;
+using BattleBall.Scripts.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -13,27 +14,25 @@ using MonoGame.Extended.Collisions;
 
 namespace BattleBall.Scripts.Entities
 {
-    public class _Player : ICollisionActor, IUpdateDrawable, IDeath
+    public class _Player : ICollisionActor, IUpdateDrawable
     {
+        // ICollisionActor
         public IShapeF Bounds { get; set; }
-        public int Lives { get; set; }
+        // IUpdateDrawable -> IBaseDisposable
         public bool isDisposed { get; private set; } = false;
-        public float radius;
         public Color color;
         private Dictionary<PlayerKeys, Keys> playerKeys = new();
-        public Vector2 velocity = Vector2.Zero;
         public Vector2 velocitydash = Vector2.Zero;
+        public Vector2 velocity = Vector2.Zero;
         public Vector2 pushBackIntensity = Vector2.Zero;
-
-        public bool[] isborder = new bool[4];
-
+        public int Lives { get; set; }
         public float timeDash = 0;
         public float timePushBackDuration = 0;
+        public bool[] isColliderBorderField = new bool[4]; // TOP, BOTTOM, LEFT, RIGHT
 
         public _Player(CircleF circle, Color color)
         {
             Bounds = circle;
-            radius = circle.Radius;
             this.color = color;
             Lives = 3;
         }
@@ -49,22 +48,28 @@ namespace BattleBall.Scripts.Entities
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawCircle((CircleF)Bounds, Physics.SIDES, color, radius);
+            CircleF circle = (CircleF)Bounds;
+            spriteBatch.DrawCircle(circle, Physics.SIDES, color, circle.Radius);
         }
 
         public void Update(GameTime gameTime)
         {
-            TimeDurationDash(gameTime);
-            TimeDurationPushBack(gameTime);
+            UpdateDurations(gameTime);
             KeysPress();
-            Moviment(gameTime);
+            UpdateMovement(gameTime);
 
         }
 
-        void TimeDurationPushBack(GameTime gameTime)
+        void UpdateDurations(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+            UpdatePushBackDuration(deltaTime);
+            UpdateDashDuration(deltaTime);
+        }
+
+        void UpdatePushBackDuration(float deltaTime)
+        {
             if (timePushBackDuration > 0)
             {
                 timePushBackDuration -= deltaTime;
@@ -77,10 +82,8 @@ namespace BattleBall.Scripts.Entities
             }
         }
 
-        void TimeDurationDash(GameTime gameTime)
+        void UpdateDashDuration(float deltaTime)
         {
-            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
             if (timeDash > 0)
             {
                 timeDash -= deltaTime;
@@ -93,82 +96,95 @@ namespace BattleBall.Scripts.Entities
             }
         }
 
-        void Moviment(GameTime gameTime)
+        void UpdateMovement(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Vector2 totalVelocity = velocity + velocitydash + pushBackIntensity;
 
-            Vector2 current = Bounds.Position;
-
-            current.X += (velocity.X + velocitydash.X + pushBackIntensity.X) * deltaTime;
-            current.Y += (velocity.Y + velocitydash.Y + pushBackIntensity.Y) * deltaTime;
-
-            Bounds.Position = current;
+            UpdatePosition(deltaTime, totalVelocity);
         }
+
+        void UpdatePosition(float deltaTime, Vector2 totalVelocity)
+        {
+            Bounds.Position += totalVelocity * deltaTime;
+        }
+
+        /// Eventos dos Botões
 
         void KeysPress()
         {
             KeyboardState keyboardState = Keyboard.GetState();
 
-            if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Up]) && !isborder[0])
+            HandleVerticalMovement(keyboardState);
+            HandleHorizontalMovement(keyboardState);
+            HandleDash(keyboardState);
+        }
+
+        void HandleVerticalMovement(KeyboardState keyboardState)
+        {
+            if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Up]) && !isColliderBorderField[0])
             {
-                velocity.Y = -Physics.DEFAULT_VELOCITY;
+                velocity.Y = -Physics.DEFAULT_VELOCITY_PLAYER;
             }
-            else if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Down]) && !isborder[1])
+            else if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Down]) && !isColliderBorderField[1])
             {
-                velocity.Y = Physics.DEFAULT_VELOCITY;
+                velocity.Y = Physics.DEFAULT_VELOCITY_PLAYER;
             }
             else
             {
                 velocity.Y = 0;
-                isborder[0] = false;
-                isborder[1] = false;
+                ResetVerticalBorders();
             }
+        }
 
-            if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Left]) && !isborder[2])
+        void HandleHorizontalMovement(KeyboardState keyboardState)
+        {
+            if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Left]) && !isColliderBorderField[2])
             {
-                velocity.X = -Physics.DEFAULT_VELOCITY;
+                velocity.X = -Physics.DEFAULT_VELOCITY_PLAYER;
             }
-            else if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Right]) && !isborder[3])
+            else if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Right]) && !isColliderBorderField[3])
             {
-                velocity.X = Physics.DEFAULT_VELOCITY;
+                velocity.X = Physics.DEFAULT_VELOCITY_PLAYER;
             }
             else
             {
                 velocity.X = 0;
-                isborder[2] = false;
-                isborder[3] = false;
+                ResetHorizontalBorders();
             }
+        }
 
+        void HandleDash(KeyboardState keyboardState)
+        {
             if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Dash]))
             {
-                if (velocitydash.Length() == 0)
+                if (velocitydash.Length() == 0 && velocity != Vector2.Zero)
                 {
-                    if (velocity != Vector2.Zero)
-                    {
-                        Vector2 normalized = Vector2.Normalize(velocity);
-                        velocitydash = normalized * Physics.DEFAULT_VELOCITY_DASH;
-                        timeDash = Physics.DEFAULT_TIME_DASH_DURATION;
-                    }
+                    Vector2 normalized = Vector2.Normalize(velocity);
+                    velocitydash = normalized * Physics.DEFAULT_VELOCITY_DASH;
+                    timeDash = Physics.DEFAULT_TIME_DASH_DURATION;
                 }
             }
         }
 
+        void ResetVerticalBorders()
+        {
+            isColliderBorderField[0] = false;
+            isColliderBorderField[1] = false;
+        }
+
+        void ResetHorizontalBorders()
+        {
+            isColliderBorderField[2] = false;
+            isColliderBorderField[3] = false;
+        }
+
+        // ICollisionActor
         public void OnCollision(CollisionEventArgs collisionInfo)
         {
             if (collisionInfo.Other is _Player player)
             {
-                Vector2 direction = Bounds.Position - player.Bounds.Position;
-
-                direction.Normalize();
-
-                float someIntensity = 1;
-
-                if (player.timeDash != 0)
-                {
-                    someIntensity = 1.5f;
-                }
-
-                pushBackIntensity = Physics.DEFAULT_PUSH_BACK_INTENSITY * someIntensity * direction;
+                pushBackIntensity = PhysicForce.ApplyPushBack(Bounds.Position, player, Physics.DEFAULT_PUSH_BACK_INTENSITY_PLAYER);
                 timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
             }
         }

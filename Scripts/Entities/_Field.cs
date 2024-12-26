@@ -1,7 +1,8 @@
 
 using System;
 using System.Collections.Generic;
-using BattleBall.Scripts.Constantes;
+using System.Linq;
+using BattleBall.Scripts.Constants;
 using BattleBall.Scripts.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,8 +13,10 @@ namespace BattleBall.Scripts.Entities
 {
     public class _Field : ICollisionActor, IUpdateDrawable
     {
-        private int distance = 5;
+        private const int DISTANCE_TO_BOUND = 5;
+        // ICollisionActor
         public IShapeF Bounds { get; set; }
+        // IUpdateDrawable -> IBaseDisposable
         public bool isDisposed { get; private set; } = false;
         public Color color;
         public float thickness;
@@ -39,157 +42,126 @@ namespace BattleBall.Scripts.Entities
         {
             if (collisionInfo.Other is _Player player)
             {
-                float distanceToTop = Bounds.BoundingRectangle.Top - player.Bounds.BoundingRectangle.Top;
-                float distanceToBottom = Bounds.BoundingRectangle.Bottom - player.Bounds.BoundingRectangle.Bottom;
-                float distanceToLeft = Bounds.BoundingRectangle.Left - player.Bounds.BoundingRectangle.Left;
-                float distanceToRight = Bounds.BoundingRectangle.Right - player.Bounds.BoundingRectangle.Right;
-
-                player.isborder[0] = distanceToTop > 0;
-                player.isborder[1] = distanceToBottom < 0;
-                player.isborder[2] = distanceToLeft > 0;
-                player.isborder[3] = distanceToRight < 0;
-
-                isColliderPlayer = player.isborder[0] || player.isborder[1] || player.isborder[2] || player.isborder[3];
-
-                if (isColliderPlayer)
-                {
-                    AdjustePosition(player);
-                    InversePhysics(player);
-                }
+                HandlePlayerCollision(player);
             }
-
-            if (collisionInfo.Other is _Ball ball)
+            else if (collisionInfo.Other is _Ball ball)
             {
-                float distanceToTop = Bounds.BoundingRectangle.Top + distance - ball.Bounds.BoundingRectangle.Top;
-                float distanceToBottom = Bounds.BoundingRectangle.Bottom - distance - ball.Bounds.BoundingRectangle.Bottom;
-                float distanceToLeft = Bounds.BoundingRectangle.Left + distance - ball.Bounds.BoundingRectangle.Left;
-                float distanceToRight = Bounds.BoundingRectangle.Right - distance - ball.Bounds.BoundingRectangle.Right;
-
-                bool isTop = distanceToTop > 0;
-                bool isBottom = distanceToBottom < 0;
-                bool isLeft = distanceToLeft > 0;
-                bool isRight = distanceToRight < 0;
-
-
-
-                if (isTop && ball.velocity.Y < 0)
-                {
-                    ball.velocity.Y = -ball.velocity.Y;
-                    ball.velocityField.Y = 200;
-                }
-                else if (isBottom && ball.velocity.Y > 0)
-                {
-                    ball.velocity.Y = -ball.velocity.Y;
-                    ball.velocityField.Y = -200;
-                }
-
-                if (isLeft && ball.velocity.X < 0)
-                {
-                    ball.velocity.X = -ball.velocity.X;
-                    ball.velocityField.X = 200;
-                }
-                else if (isRight && ball.velocity.X > 0)
-                {
-                    ball.velocity.X = -ball.velocity.X;
-                    ball.velocityField.X = -200;
-                }
-
-                if (isTop)
-                {
-                    ball.Bounds.Position = new Vector2(ball.Bounds.Position.X, Bounds.BoundingRectangle.Top + ball.radius + thickness + distance);
-                }
-                else if (isBottom)
-                {
-                    ball.Bounds.Position = new Vector2(ball.Bounds.Position.X, Bounds.BoundingRectangle.Bottom - ball.radius - thickness - distance);
-                }
-
-                if (isLeft)
-                {
-                    ball.Bounds.Position = new Vector2(Bounds.BoundingRectangle.Left + ball.radius + thickness + distance, ball.Bounds.Position.Y);
-                }
-                else if (isRight)
-                {
-                    ball.Bounds.Position = new Vector2(Bounds.BoundingRectangle.Right - ball.radius - thickness - distance, ball.Bounds.Position.Y);
-                }
+                HandleBallCollision(ball);
             }
         }
 
-        void AdjustePosition(_Player player)
+        void HandlePlayerCollision(_Player player)
         {
-            if (player.isborder[0])
-            {
-                player.Bounds.Position = new Vector2(player.Bounds.Position.X, Bounds.BoundingRectangle.Top + player.radius + thickness);
-            }
-            else if (player.isborder[1])
-            {
-                player.Bounds.Position = new Vector2(player.Bounds.Position.X, Bounds.BoundingRectangle.Bottom - player.radius - thickness);
-            }
+            float[] distanceToBorder = GetDistanceToBorder(player.Bounds.BoundingRectangle);
+            player.isColliderBorderField = IsCollidingWithBorder(distanceToBorder);
 
-            if (player.isborder[2])
+            if (IsCollided(player.isColliderBorderField))
             {
-                player.Bounds.Position = new Vector2(Bounds.BoundingRectangle.Left + player.radius + thickness, player.Bounds.Position.Y);
-            }
-            else if (player.isborder[3])
-            {
-                player.Bounds.Position = new Vector2(Bounds.BoundingRectangle.Right - player.radius - thickness, player.Bounds.Position.Y);
+                player.Bounds.Position = AdjustPosition(player.Bounds.Position, player.isColliderBorderField, ((CircleF)player.Bounds).Radius);
+                player.velocity = InversePhysics(player.velocity, player.isColliderBorderField);
+                player.velocitydash = InversePhysics(player.velocitydash, player.isColliderBorderField);
+
+                UpdateForceDuration(player);
             }
         }
 
-        void InversePhysics(_Player player)
+        void HandleBallCollision(_Ball ball)
         {
-            if (player.isborder[0])
+            float[] distanceToBorder = GetDistanceToBorder(ball.Bounds.BoundingRectangle);
+            bool[] colliderBorder = IsCollidingWithBorder(distanceToBorder);
+
+            if (IsCollided(colliderBorder))
             {
-                if (player.velocitydash.Y < 0)
-                {
-                    player.velocitydash.Y = Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                    player.timeDash = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                }
-                if (player.pushBackIntensity.Y < 0)
-                {
-                    player.pushBackIntensity.Y = Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                    player.timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                }
-            }
-            else if (player.isborder[1])
-            {
-                if (player.velocitydash.Y > 0)
-                {
-                    player.velocitydash.Y = -Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                    player.timeDash = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                }
-                if (player.pushBackIntensity.Y > 0)
-                {
-                    player.pushBackIntensity.Y = -Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                    player.timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                }
-            }
-            if (player.isborder[2])
-            {
-                if (player.velocitydash.X < 0)
-                {
-                    player.velocitydash.X = Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                    player.timeDash = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                }
-                if (player.pushBackIntensity.X < 0)
-                {
-                    player.pushBackIntensity.X = Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                    player.timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                }
-            }
-            else if (player.isborder[3])
-            {
-                if (player.velocitydash.X > 0)
-                {
-                    player.velocitydash.X = -Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                    player.timeDash = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                }
-                if (player.pushBackIntensity.X > 0)
-                {
-                    player.pushBackIntensity.X = -Physics.DEFAULT_PUSH_BACK_INTENSITY;
-                    player.timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
-                }
+                ball.velocity = InversePhysicsBall(ball.velocity, colliderBorder);
+                ball.velocityField = UpdateBallVelocityField(ball.velocity, ball.velocityField, colliderBorder, 300);
+                ball.Bounds.Position = AdjustPosition(ball.Bounds.Position, colliderBorder, ((CircleF)ball.Bounds).Radius);
             }
         }
+
+        void UpdateForceDuration(_Player player)
+        {
+            if (player.timeDash != 0 || player.timePushBackDuration != 0)
+            {
+                player.timePushBackDuration = Physics.DEFAULT_TIME_PUSH_BACK_DURATION;
+            }
+        }
+
+        bool IsCollided(bool[] isCollidingWithBorder)
+        {
+            return isCollidingWithBorder.Any(collision => collision);
+        }
+
+        bool[] IsCollidingWithBorder(float[] distances)
+        {
+            return new[]
+            {
+        distances[0] > 0,
+        distances[1] < 0,
+        distances[2] > 0,
+        distances[3] < 0
+    };
+        }
+
+        float[] GetDistanceToBorder(RectangleF collider)
+        {
+            RectangleF rectangleField = Bounds.BoundingRectangle;
+
+            return new[]
+            {
+        rectangleField.Top + DISTANCE_TO_BOUND - collider.Top,
+        rectangleField.Bottom - DISTANCE_TO_BOUND - collider.Bottom,
+        rectangleField.Left + DISTANCE_TO_BOUND - collider.Left,
+        rectangleField.Right - DISTANCE_TO_BOUND - collider.Right
+    };
+        }
+
+        Vector2 AdjustPosition(Vector2 position, bool[] bordersColliding, float radius)
+        {
+            RectangleF rectangle = Bounds.BoundingRectangle;
+            float distanceBase = radius + thickness + DISTANCE_TO_BOUND;
+
+            if (bordersColliding[0]) position.Y = rectangle.Top + distanceBase;
+            else if (bordersColliding[1]) position.Y = rectangle.Bottom - distanceBase;
+
+            if (bordersColliding[2]) position.X = rectangle.Left + distanceBase;
+            else if (bordersColliding[3]) position.X = rectangle.Right - distanceBase;
+
+            return position;
+        }
+
+        Vector2 InversePhysics(Vector2 velocity, bool[] bordersColliding)
+        {
+            if (bordersColliding[0] && velocity.Y < 0) velocity.Y = Physics.DEFAULT_PUSH_BACK_INTENSITY_BALL;
+            else if (bordersColliding[1] && velocity.Y > 0) velocity.Y = -Physics.DEFAULT_PUSH_BACK_INTENSITY_BALL;
+
+            if (bordersColliding[2] && velocity.X < 0) velocity.X = Physics.DEFAULT_PUSH_BACK_INTENSITY_BALL;
+            else if (bordersColliding[3] && velocity.X > 0) velocity.X = -Physics.DEFAULT_PUSH_BACK_INTENSITY_BALL;
+
+            return velocity;
+        }
+
+        Vector2 InversePhysicsBall(Vector2 velocity, bool[] bordersColliding)
+        {
+            if (bordersColliding[0] && velocity.Y < 0) velocity.Y = -velocity.Y;
+            else if (bordersColliding[1] && velocity.Y > 0) velocity.Y = -velocity.Y;
+
+            if (bordersColliding[2] && velocity.X < 0) velocity.X = -velocity.X;
+            else if (bordersColliding[3] && velocity.X > 0) velocity.X = -velocity.X;
+
+            return velocity;
+        }
+
+        Vector2 UpdateBallVelocityField(Vector2 velocity, Vector2 velocityField, bool[] bordersColliding, float value)
+        {
+            if (bordersColliding[0] && velocity.Y > 0) velocityField.Y = value;
+            else if (bordersColliding[1] && velocity.Y < 0) velocityField.Y = -value;
+
+            if (bordersColliding[2] && velocity.X > 0) velocityField.X = value;
+            else if (bordersColliding[3] && velocity.X < 0) velocityField.X = -value;
+
+            return velocityField;
+        }
+
 
         public void Dispose()
         {

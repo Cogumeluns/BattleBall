@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BattleBall.Scripts.Constantes;
+using BattleBall.Scripts.Constants;
 using BattleBall.Scripts.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,11 +17,11 @@ namespace BattleBall.Scripts.Entities
         public bool isDisposed { get; private set; }
         public float radius;
         public Color color;
-        public List<IDeath> players = new();
+        public List<_Player> players = new();
         InstantiateBallLight instantiateBallLight;
         int damage = 1;
 
-        public _BallLIght(CircleF circle, Color color, List<IDeath> players, InstantiateBallLight instantiateBallLight)
+        public _BallLIght(CircleF circle, Color color, List<_Player> players, InstantiateBallLight instantiateBallLight)
         {
             Bounds = circle;
             radius = circle.Radius;
