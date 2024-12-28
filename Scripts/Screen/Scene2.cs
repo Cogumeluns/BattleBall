@@ -11,13 +11,13 @@ public class Scene2 : GameScreen
     private Texture2D _logo;
     private SpriteFont _font;
     private Vector2 _position = new Vector2(50, 50);
-    
+
     public Scene2(GameMain game) : base(game) { }
 
     public override void LoadContent()
     {
         base.LoadContent();
-        _font = Game.Content.Load<SpriteFont>("fonts/arial");
+        _font = Game.Content.Load<SpriteFont>("fonts/File");
         _logo = Game.Content.Load<Texture2D>("textures/texture");
     }
 
