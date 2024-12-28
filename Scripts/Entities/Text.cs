@@ -15,16 +15,15 @@ namespace BattleBall.Scripts.Entities
         private Color colorBackground;
         public SpriteFont spriteFont;
         public string text;
-        public Vector2 position;
+        public Vector2 position = Vector2.Zero;
         private Color color;
         public float scale;
         public bool isDisposed { get; set; }
 
-        public Text(SpriteFont spriteFont, string text, Vector2 position, Color color, float scale)
+        public Text(SpriteFont spriteFont, string text, Color color, float scale)
         {
             this.spriteFont = spriteFont;
             this.text = text;
-            this.position = position;
             this.color = color;
             this.scale = scale;
         }
