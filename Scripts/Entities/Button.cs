@@ -20,14 +20,26 @@ namespace BattleBall.Scripts.Entities
         public event EventHandler OnClick;
         private bool isClicked;
         private float alpha;
+        private Text text;
 
 
-        public Button(Texture2D t, Vector2 p, Size s, EventHandler OnClick)
+        public Button(Texture2D t, Vector2 p, Size s, Text text, EventHandler OnClick)
         {
             _texture = t;
             _rect = new((int)p.X, (int)p.Y, s.Width, s.Height);
             this.OnClick = OnClick;
+            this.text = text;
+            AdjustPosition(p, s);
+        }
 
+        public void AdjustPosition(Vector2 p, Size s)
+        {
+            Vector2 textMeasure = text.spriteFont.MeasureString(text.text) * text.scale;
+            Vector2 textP = p;
+            textP.X += (s.Width - textMeasure.X) / 2;
+            textP.Y += (s.Height - textMeasure.Y) / 2;
+
+            text.position = textP;
         }
 
         Vector2 GetPositionMouse() => new(mouseState.X, mouseState.Y);
@@ -62,8 +74,8 @@ namespace BattleBall.Scripts.Entities
         public void Update(GameTime gameTime)
         {
             mouseState = Mouse.GetState();
-            HandlerMouseKeyPress();
             HandlerOpacity();
+            HandlerMouseKeyPress();
         }
 
         private void Click()
@@ -75,6 +87,8 @@ namespace BattleBall.Scripts.Entities
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(_texture, _rect, Color.White * alpha);
+            if (text != null)
+                text.Draw(spriteBatch);
         }
 
         public void Dispose()
