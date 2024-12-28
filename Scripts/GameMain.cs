@@ -2,17 +2,15 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Screens;
-using MonoGame.Extended.Screens.Transitions;
 
 namespace BattleBall;
 
 public class GameMain : Game
 {
     private GraphicsDeviceManager _graphics;
-    
-    private readonly ScreenManager _screenManager;
 
     public SpriteBatch SpriteBatch;
+    public readonly GameSceneManager gameSceneManager;
 
     public GameMain()
     {
@@ -20,7 +18,9 @@ public class GameMain : Game
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
 
-        _screenManager = new ScreenManager();
+        var _screenManager = new ScreenManager();
+        gameSceneManager = new GameSceneManager(this, _screenManager);
+
         Components.Add(_screenManager);
     }
 
@@ -28,8 +28,9 @@ public class GameMain : Game
     {
         // TODO: Add your initialization logic here
 
+        gameSceneManager.LoadScene(Scene.SCENE_1);
+
         base.Initialize();
-        LoadScreen1();
     }
 
     protected override void LoadContent()
@@ -47,11 +48,10 @@ public class GameMain : Game
             Exit();
         if (keyboardState.IsKeyDown(Keys.Down))
         {
-            LoadScreen1();
-        }
-        else if (keyboardState.IsKeyDown(Keys.Up))
+            gameSceneManager.LoadScene(Scene.SCENE_1);
+        } else if (keyboardState.IsKeyDown(Keys.Up))
         {
-            LoadScreen2();
+            gameSceneManager.LoadScene(Scene.SCENE_2);
         }
         base.Update(gameTime);
     }
@@ -64,15 +64,4 @@ public class GameMain : Game
 
         base.Draw(gameTime);
     }
-
-    private void LoadScreen1()
-    {
-        _screenManager.LoadScreen(new Screen1(this), new FadeTransition(GraphicsDevice, Color.Black));
-    }
-
-    private void LoadScreen2()
-    {
-        _screenManager.LoadScreen(new MyScreen2(this), new FadeTransition(GraphicsDevice, Color.Black));
-    }
-
 }
