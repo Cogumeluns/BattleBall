@@ -28,6 +28,15 @@ namespace BattleBall.Scripts.Entities
             this.scale = scale;
         }
 
+        public Text(SpriteFont spriteFont, string text, Vector2 position, Color color, float scale)
+        {
+            this.spriteFont = spriteFont;
+            this.text = text;
+            this.position = position;
+            this.color = color;
+            this.scale = scale;
+        }
+
         public Text(SpriteFont spriteFont, string text, Vector2 position, Color color, float scale, Texture2D textureBackground, Color colorBackground)
         {
             this.spriteFont = spriteFont;

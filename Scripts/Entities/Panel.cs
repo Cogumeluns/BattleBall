@@ -27,15 +27,15 @@ namespace BattleBall.Scripts.Entities
 
         public void AddTexts(List<Text> texts, float spacing)
         {
-            float y = 0;
+            float currentY = rect.Y;
 
             foreach (var item in texts)
             {
-                Vector2 textMeasure = item.spriteFont.MeasureString(item.text);
+                Vector2 textMeasure = item.spriteFont.MeasureString(item.text) * item.scale;
 
-                y = textMeasure.Y;
+                item.position += new Vector2(rect.X + 30, currentY + 10);
 
-                item.position = new(rect.X, rect.Y);
+                currentY += textMeasure.Y + spacing;
 
                 _elements.Add(item);
             }
@@ -43,17 +43,17 @@ namespace BattleBall.Scripts.Entities
 
         public void Dispose()
         {
-            throw new NotImplementedException();
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            throw new NotImplementedException();
+            spriteBatch.Draw(texture2D, rect, colorBackground);
+            _elements.ForEach(x => x.Draw(spriteBatch));
         }
 
         public void Update(GameTime gameTime)
         {
-            throw new NotImplementedException();
+            // Não faz nada.
         }
     }
 }

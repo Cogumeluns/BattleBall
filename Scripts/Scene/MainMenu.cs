@@ -16,11 +16,11 @@ public class MainMenu : GameScreen
     public override void LoadContent()
     {
         _elements.AddRange(new List<IUpdateDrawable>()
-            {
-                new Button(Content.Load<Texture2D>("textures/button"), new(100, 300), new(365, 80),
-                            new Text(Content.Load<SpriteFont>("fonts/montserratbold"), "Click", Color.Black, 2f), MyClickHandler),
-                new Text(Content.Load<SpriteFont>("fonts/modak"), "Title", Vector2.Zero, Color.White, 1f, Content.Load<Texture2D>("textures/button"), Color.Green)
-            }
+        {
+            new Button(Content.Load<Texture2D>("textures/button"), new(100, 300), new(365, 80),
+                        new Text(Content.Load<SpriteFont>("fonts/montserratbold"), "Click", Color.Black, 2f), MyClickHandler),
+            new Text(Content.Load<SpriteFont>("fonts/modak"), "Title", Vector2.Zero, Color.White, 1f, Content.Load<Texture2D>("textures/button"), Color.Green),
+        }
         );
         base.LoadContent();
     }
