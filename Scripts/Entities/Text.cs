@@ -20,7 +20,7 @@ namespace BattleBall.Scripts.Entities
         public float scale;
         public bool isDisposed { get; set; }
 
-        public bool isVisible;
+        public bool isVisible { get; set; } = true;
 
         public Text(SpriteFont spriteFont, string text, Color color, float scale, bool isVisible)
         {

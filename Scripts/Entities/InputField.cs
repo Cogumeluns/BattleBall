@@ -25,6 +25,8 @@ namespace BattleBall.Scripts.Entities
 
         public bool isDisposed => throw new NotImplementedException();
 
+        public bool isVisible { get; set; } = true;
+
         private KeyboardState previousKeyboardState = Keyboard.GetState();
         private readonly Button button;
 

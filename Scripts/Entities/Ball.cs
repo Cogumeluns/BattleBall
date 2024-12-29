@@ -22,6 +22,7 @@ namespace BattleBall.Scripts.Entities
         public Color color;
         public Vector2 velocity = Vector2.Zero;
         public Vector2 velocityField = Vector2.Zero;
+        public bool isVisible { get; set; } = true;
 
         public Ball(CircleF circle, Color color)
         {

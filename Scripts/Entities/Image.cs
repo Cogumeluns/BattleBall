@@ -14,6 +14,7 @@ namespace BattleBall.Scripts.Entities
         private Texture2D texture2D;
         private Rectangle rect;
         private Color color;
+        public bool isVisible { get; set; } = true;
 
         public Image(Texture2D texture2D, Rectangle rect, Color color)
         {

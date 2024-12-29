@@ -8,7 +8,7 @@ namespace BattleBall;
 
 public class GameMain : Game
 {
-    private GraphicsDeviceManager _graphics;
+    public GraphicsDeviceManager _graphics;
     public SpriteBatch SpriteBatch;
 
     public Size GameBound = new(1440, 1024);
@@ -31,7 +31,7 @@ public class GameMain : Game
     {
         // TODO: Add your initialization logic here
 
-        gameSceneManager.LoadScene(Scene.LAN_MODE);
+        gameSceneManager.LoadScene(Scene.GAME_MODE);
 
         base.Initialize();
     }

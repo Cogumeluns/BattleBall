@@ -10,6 +10,7 @@ namespace BattleBall.Scripts.Entities
 {
     public class Panel : IUpdateDrawable
     {
+        public bool isVisible { get; set; } = true;
         public bool isDisposed { get; set; }
 
         private List<IUpdateDrawable> _elements = new();

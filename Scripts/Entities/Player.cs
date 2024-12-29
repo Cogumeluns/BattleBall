@@ -24,16 +24,32 @@ namespace BattleBall.Scripts.Entities
         public Vector2 velocitydash = Vector2.Zero;
         public Vector2 velocity = Vector2.Zero;
         public Vector2 pushBackIntensity = Vector2.Zero;
+        public Vector2[] positionHealth = new Vector2[3];
+        public Vector2 timerToUseDash = Vector2.Zero;
         public int Lives { get; set; }
         public float timeDash = 0;
         public float timePushBackDuration = 0;
         public bool[] isColliderBorderField = new bool[4]; // TOP, BOTTOM, LEFT, RIGHT
 
-        public Player(CircleF circle, Color color)
+        public bool isVisible { get; set; } = true;
+        public bool isPlayer1;
+
+        public Player(CircleF circle, Color color, bool isPlayer1)
         {
             Bounds = circle;
             this.color = color;
             Lives = 3;
+            this.isPlayer1 = isPlayer1;
+            if (isPlayer1)
+            {
+                SetPositionHeath(new(60, 25), 45);
+            }
+            else
+            {
+                SetPositionHeath(new(1285, 25), 45);
+            }
+
+            SetPositionDash();
         }
 
         public void Damage(int damage)
@@ -46,6 +62,26 @@ namespace BattleBall.Scripts.Entities
             }
         }
 
+        public void SetPositionHeath(Vector2 vector2, float someX)
+        {
+            for (int i = 0; i < Lives; i++)
+            {
+                positionHealth[i] = new(vector2.X + someX * i, vector2.Y);
+            }
+        }
+
+        public void SetPositionDash()
+        {
+            if (isPlayer1)
+            {
+                timerToUseDash = new(650, 25);
+            }
+            else
+            {
+                timerToUseDash = new(900, 25);
+            }
+        }
+
         public void SetKeys(Keys up, Keys down, Keys left, Keys right, Keys dash)
         {
             playerKeys.Add(PlayerKeys.Up, up);
@@ -55,9 +91,27 @@ namespace BattleBall.Scripts.Entities
             playerKeys.Add(PlayerKeys.Dash, dash);
         }
 
+        void DrawHeath(SpriteBatch spriteBatch)
+        {
+            CircleF circle;
+            for (int i = 0; i < Lives; i++)
+            {
+                circle = new(positionHealth[i], 15);
+                spriteBatch.DrawCircle(circle, Physics.SIDES, color, circle.Radius);
+            }
+        }
+
+        void DrawDash(SpriteBatch spriteBatch)
+        {
+            CircleF circle = new(timerToUseDash, 15);
+            spriteBatch.DrawCircle(circle, Physics.SIDES, timeDash <= 0 ? color : Color.Black, circle.Radius);
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
             CircleF circle = (CircleF)Bounds;
+            DrawHeath(spriteBatch);
+            DrawDash(spriteBatch);
             spriteBatch.DrawCircle(circle, Physics.SIDES, color, circle.Radius);
         }
 

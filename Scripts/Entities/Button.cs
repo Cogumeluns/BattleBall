@@ -15,12 +15,14 @@ namespace BattleBall.Scripts.Entities
         private readonly Texture2D _texture;
         private readonly Rectangle _rect;
         private Color _shade = Color.White;
-        public bool isDisposed => throw new NotImplementedException();
+        public bool isDisposed { get; private set; }
         private MouseState mouseState = Mouse.GetState();
         public event EventHandler OnClick;
         private bool isClicked;
         private float alpha;
         private Text text;
+
+        public bool isVisible { get; set; } = true;
 
 
         public Button(Texture2D t, Vector2 p, Size s, Text text, EventHandler OnClick)
