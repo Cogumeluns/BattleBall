@@ -19,6 +19,10 @@ namespace BattleBall.Scripts.Events
         {
             mainMenu.Game.gameSceneManager.LoadScene(global::Scene.LAN_MODE);
         }
+        public void OnClientMode(object sender, EventArgs e)
+        {
+            mainMenu.Game.gameSceneManager.LoadScene(global::Scene.CLIENT_MODE);
+        }
         public void OnQuit(object sender, EventArgs e)
         {
             mainMenu.Game.Exit();

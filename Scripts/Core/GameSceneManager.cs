@@ -27,7 +27,10 @@ public class GameSceneManager
                 _screenManager.LoadScreen(new LocalMode(_game), new FadeTransition(_game.GraphicsDevice, Color.Black));
                 break;
             case Scene.LAN_MODE:
-                _screenManager.LoadScreen(new LanMode(_game), new FadeTransition(_game.GraphicsDevice, Color.Black));
+                _screenManager.LoadScreen(new LanMode(_game, true), new FadeTransition(_game.GraphicsDevice, Color.Black));
+                break;
+            case Scene.CLIENT_MODE:
+                _screenManager.LoadScreen(new LanMode(_game, false), new FadeTransition(_game.GraphicsDevice, Color.Black));
                 break;
             case Scene.GAME_MODE:
                 _screenManager.LoadScreen(new GameMode(_game), new FadeTransition(_game.GraphicsDevice, Color.Black));
@@ -41,5 +44,5 @@ public class GameSceneManager
 
 public enum Scene
 {
-    MAIN_MENU, LAN_MODE, LOCAL_MODE, GAME_MODE, ABOUT
+    MAIN_MENU, LAN_MODE, CLIENT_MODE, LOCAL_MODE, GAME_MODE, ABOUT
 }

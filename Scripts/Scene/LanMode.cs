@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BattleBall;
 using BattleBall.Scripts.Entities;
@@ -10,10 +11,16 @@ using MonoGame.Extended.Screens;
 public class LanMode : GameScreen
 {
     public new GameMain Game => (GameMain)base.Game;
-    public LanMode(GameMain game) : base(game) { }
+    public LanMode(GameMain game, bool isMaster) : base(game)
+    {
+        this.isMaster = isMaster;
+    }
 
     List<IUpdateDrawable> _elements = new();
     EventLanMode eventLanMode;
+    List<Text> connecting = new();
+    public bool isMaster;
+    public bool tempConnecting = false; // um exemplo de como mudar a cena.
 
     public override void LoadContent()
     {
@@ -47,12 +54,46 @@ public class LanMode : GameScreen
             new Text(montserratBold, " Left ", Color.Black, 1f, true, new(1058, 440), rectangle, Color.White),
             new Text(montserratBold, " Right ", Color.Black, 1f, true, new(1058, 510), rectangle, Color.White),
             new Text(montserratBold, " 0 ", Color.Black, 1f, true, new(1058, 580), rectangle, Color.White),
-
-            new InputField(button, new(500, 773, 440, 78), montserratRegular),
-
-            new Button(button, new(1083, 900), new(310, 80), new Text(montserratBold, "START", Color.Black, 1f, true), eventLanMode.OnStartGameMode)
         });
+
+        if (isMaster)
+            OnLoadContentMaster(button, montserratRegular, montserratBold);
+        else
+            OnLoadContentClient(button, montserratRegular, montserratBold);
         base.LoadContent();
+    }
+
+
+    private void OnLoadContentClient(Texture2D button, SpriteFont montserratRegular, SpriteFont montserratBold)
+    {
+        _elements.Add(new InputField(button, new(500, 773, 440, 78), montserratRegular));
+
+        int xFailure = (int)((Game._graphics.PreferredBackBufferWidth - montserratBold.MeasureString("Failure").X) / 2);
+        int xConnect = (int)((Game._graphics.PreferredBackBufferWidth - montserratBold.MeasureString("Connected").X) / 2);
+
+        connecting.AddRange(new List<Text>()
+        {
+            new Text(montserratBold, "Failure", Color.Red, 1f, true, new(xFailure, 869)),
+            new Text(montserratBold, "Connected", Color.Green, 1f, true, new(xConnect, 869)),
+        });
+
+        _elements.AddRange(connecting);
+    }
+
+    private void OnLoadContentMaster(Texture2D button, SpriteFont montserratRegular, SpriteFont montserratBold)
+    {
+        _elements.Add(new Button(button, new(1083, 900), new(310, 80), new Text(montserratBold, "START", Color.Black, 1f, true), eventLanMode.OnStartGameMode));
+
+        int xWainting = (int)((Game._graphics.PreferredBackBufferWidth - montserratBold.MeasureString("Waiting...").X) / 2);
+        int xConnect = (int)((Game._graphics.PreferredBackBufferWidth - montserratBold.MeasureString("Connected").X) / 2);
+
+        connecting.AddRange(new List<Text>()
+        {
+            new Text(montserratBold, "Waiting...", new(95,95,95), 1f, true, new(xWainting, 869)),
+            new Text(montserratBold, "Connected", Color.Green, 1f, true, new(xConnect, 869)),
+        });
+
+        _elements.AddRange(connecting);
     }
 
     public override void Initialize()
@@ -61,14 +102,34 @@ public class LanMode : GameScreen
     }
     public override void Update(GameTime gameTime)
     {
+        ChangeTextConnectingActive();
+
         _elements.ForEach(x => x.Update(gameTime));
+    }
+
+    private void ChangeTextConnectingActive()
+    {
+        if (tempConnecting)
+        {
+            connecting[1].isVisible = true;
+            connecting[0].isVisible = false;
+        }
+        else
+        {
+            connecting[0].isVisible = true;
+            connecting[1].isVisible = false;
+        }
     }
 
     public override void Draw(GameTime gameTime)
     {
         Game.GraphicsDevice.Clear(Color.Black);
         Game.SpriteBatch.Begin();
-        _elements.ForEach(x => x.Draw(Game.SpriteBatch));
+        _elements.ForEach(x =>
+        {
+            if (!x.isVisible) return;
+            x.Draw(Game.SpriteBatch);
+        });
         Game.SpriteBatch.End();
     }
 }
