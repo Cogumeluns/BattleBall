@@ -28,6 +28,7 @@ namespace BattleBall.Scripts.Entities
         public Vector2 timerToUseDash = Vector2.Zero;
         public int Lives { get; set; }
         public float timeDash = 0;
+        public float timeWaitDash = 0;
         public float timePushBackDuration = 0;
         public bool[] isColliderBorderField = new bool[4]; // TOP, BOTTOM, LEFT, RIGHT
 
@@ -104,7 +105,7 @@ namespace BattleBall.Scripts.Entities
         void DrawDash(SpriteBatch spriteBatch)
         {
             CircleF circle = new(timerToUseDash, 15);
-            spriteBatch.DrawCircle(circle, Physics.SIDES, timeDash <= 0 ? color : Color.Black, circle.Radius);
+            spriteBatch.DrawCircle(circle, Physics.SIDES, timeWaitDash <= 0 ? color : Color.Black, circle.Radius);
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -129,6 +130,7 @@ namespace BattleBall.Scripts.Entities
 
             UpdatePushBackDuration(deltaTime);
             UpdateDashDuration(deltaTime);
+            UpdateDashWait(deltaTime);
         }
 
         void UpdatePushBackDuration(float deltaTime)
@@ -155,6 +157,19 @@ namespace BattleBall.Scripts.Entities
                 {
                     timeDash = 0;
                     velocitydash = Vector2.Zero;
+                }
+            }
+        }
+
+        void UpdateDashWait(float deltaTime)
+        {
+            if (timeWaitDash > 0)
+            {
+                timeWaitDash -= deltaTime;
+
+                if (timeWaitDash <= 0)
+                {
+                    timeWaitDash = 0;
                 }
             }
         }
@@ -219,13 +234,14 @@ namespace BattleBall.Scripts.Entities
 
         void HandleDash(KeyboardState keyboardState)
         {
-            if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Dash]))
+            if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Dash]) && timeWaitDash <= 0)
             {
                 if (velocitydash.Length() == 0 && velocity != Vector2.Zero)
                 {
                     Vector2 normalized = Vector2.Normalize(velocity);
                     velocitydash = normalized * Physics.DEFAULT_VELOCITY_DASH;
                     timeDash = Physics.DEFAULT_TIME_DASH_DURATION;
+                    timeWaitDash = Physics.DEFAULT_TIME_DASH_WAIT;
                 }
             }
         }

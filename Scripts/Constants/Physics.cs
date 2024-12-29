@@ -11,6 +11,7 @@ namespace BattleBall.Scripts.Constants
 
         public const float DEFAULT_PUSH_BACK_INTENSITY_BALL = 900;
         public const float DEFAULT_TIME_DASH_DURATION = 0.5f;
+        public const float DEFAULT_TIME_DASH_WAIT = 1.5f;
         public const float DEFAULT_TIME_PUSH_BACK_DURATION = 0.3f;
     }
 }
