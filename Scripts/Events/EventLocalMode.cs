@@ -12,5 +12,10 @@ namespace BattleBall.Scripts.Events
         {
             this.localMode = localMode;
         }
+
+        public void OnStartGameMode(object sender, EventArgs e)
+        {
+            localMode.Game.gameSceneManager.LoadScene(global::Scene.GAME_MODE);
+        }
     }
 }

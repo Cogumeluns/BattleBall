@@ -47,7 +47,7 @@ public class LocalMode : GameScreen
             new Text(montserratBold, " Right ", Color.Black, 1f, true, new(1058, 510), rectangle, Color.White),
             new Text(montserratBold, " 0 ", Color.Black, 1f, true, new(1058, 580), rectangle, Color.White),
 
-            new Button(button, new(1083, 900), new(310, 80), new Text(montserratBold, "START", Color.Black, 1f, true), null)
+            new Button(button, new(1083, 900), new(310, 80), new Text(montserratBold, "START", Color.Black, 1f, true), eventLocalMode.OnStartGameMode)
         });
         base.LoadContent();
     }

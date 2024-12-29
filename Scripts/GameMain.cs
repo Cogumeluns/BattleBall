@@ -31,7 +31,7 @@ public class GameMain : Game
     {
         // TODO: Add your initialization logic here
 
-        gameSceneManager.LoadScene(Scene.GAME_MODE);
+        gameSceneManager.LoadScene(Scene.MAIN_MENU);
 
         base.Initialize();
     }

@@ -20,7 +20,7 @@ namespace BattleBall.Scripts.Entities
 
         public List<Player> Players { get; set; } = new();
 
-        public Timer(SpriteFont font, Vector2 position, Player p1, Player p2, float startTime = 3f)
+        public Timer(SpriteFont font, Vector2 position, Player p1, Player p2, float startTime = 300f)
         {
             Font = font;
             Position = position;

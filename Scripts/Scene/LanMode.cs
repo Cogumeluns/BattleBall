@@ -9,14 +9,16 @@ using MonoGame.Extended.Screens;
 
 public class LanMode : GameScreen
 {
-    private new GameMain Game => (GameMain)base.Game;
+    public new GameMain Game => (GameMain)base.Game;
     public LanMode(GameMain game) : base(game) { }
 
     List<IUpdateDrawable> _elements = new();
-    EventLanMode eventLanMode = new();
+    EventLanMode eventLanMode;
 
     public override void LoadContent()
     {
+        eventLanMode = new(this);
+
         SpriteFont montserratBold = Content.Load<SpriteFont>("fonts/montserratbold");
         SpriteFont montserratRegular = Content.Load<SpriteFont>("fonts/montserratregular");
 
@@ -48,7 +50,7 @@ public class LanMode : GameScreen
 
             new InputField(button, new(500, 773, 440, 78), montserratRegular),
 
-            new Button(button, new(1083, 900), new(310, 80), new Text(montserratBold, "START", Color.Black, 1f, true), null)
+            new Button(button, new(1083, 900), new(310, 80), new Text(montserratBold, "START", Color.Black, 1f, true), eventLanMode.OnStartGameMode)
         });
         base.LoadContent();
     }

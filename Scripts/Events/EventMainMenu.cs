@@ -13,7 +13,7 @@ namespace BattleBall.Scripts.Events
 
         public void OnLocalMode(object sender, EventArgs e)
         {
-            Console.WriteLine("OnLocalMode");
+            mainMenu.Game.gameSceneManager.LoadScene(global::Scene.LOCAL_MODE);
         }
         public void OnLanMode(object sender, EventArgs e)
         {
@@ -21,7 +21,7 @@ namespace BattleBall.Scripts.Events
         }
         public void OnQuit(object sender, EventArgs e)
         {
-            Console.WriteLine("OnQuit");
+            mainMenu.Game.Exit();
         }
         public void OnAbout(object sender, EventArgs e)
         {

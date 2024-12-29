@@ -7,10 +7,15 @@ namespace BattleBall.Scripts.Events
 {
     public class EventLanMode
     {
-        // Exemplo
-        public void OnLocalMode(object sender, EventArgs e)
+        LanMode lanMode;
+        public EventLanMode(LanMode lanMode)
         {
-            Console.WriteLine("OnLocalMode");
+            this.lanMode = lanMode;
+        }
+
+        public void OnStartGameMode(object sender, EventArgs e)
+        {
+            lanMode.Game.gameSceneManager.LoadScene(global::Scene.GAME_MODE);
         }
     }
 }
