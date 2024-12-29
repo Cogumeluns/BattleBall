@@ -10,9 +10,7 @@ namespace BattleBall.Scripts.Entities
 {
     public class Text : IUpdateDrawable
     {
-        private Texture2D texture2D;
-        private Rectangle rect;
-        private Color colorBackground;
+        private Image _image;
         public SpriteFont spriteFont;
         public string text;
         public Vector2 position = Vector2.Zero;
@@ -37,36 +35,47 @@ namespace BattleBall.Scripts.Entities
             this.position = position;
         }
 
-        public Text(SpriteFont spriteFont, string text, Color color, float scale, bool isVisible, Vector2 position, Texture2D textureBackground, Color colorBackground)
+        public Text(SpriteFont spriteFont, string text, Color color, float scale, bool isVisible, Vector2 position, Image image)
         : this(spriteFont, text, color, scale, isVisible, position)
         {
-            this.colorBackground = colorBackground;
-            texture2D = textureBackground;
+            this._image = image;
             AdjustPosition();
+        }
+
+        public Vector2 GetMeasureText() => spriteFont.MeasureString(text) * scale;
+
+        public void AdjustCenterPosition(Rectangle rect)
+        {
+            Vector2 textMeasure = GetMeasureText();
+            Vector2 textP = new(rect.X, rect.Y);
+            textP.X += (rect.Width - textMeasure.X) / 2;
+            textP.Y += (rect.Height - textMeasure.Y) / 2;
+            position = textP;
+        }
+
+        public void AdjustCenterPosition(Rectangle rect, int someX, int someY)
+        {
+            rect.X += someX;
+            rect.Y += someY;
+            AdjustCenterPosition(rect);
         }
 
         void AdjustPosition()
         {
-            Vector2 textSize = spriteFont.MeasureString(text) * scale;
-            rect = new((int)position.X, (int)position.Y, (int)textSize.X, (int)textSize.Y);
+            Vector2 textSize = GetMeasureText();
+            _image.rect = new((int)position.X, (int)position.Y, (int)textSize.X, (int)textSize.Y);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            if (texture2D != null)
-                spriteBatch.Draw(texture2D, rect, colorBackground);
+            if (_image != null)
+                _image.Draw(spriteBatch);
 
             spriteBatch.DrawString(spriteFont, text, position, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
         }
 
-        public void Update(GameTime gameTime)
-        {
-            // Não tem nada para atualizar.
-        }
+        public void Update(GameTime gameTime) { }
 
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+        public void Dispose() { }
     }
 }

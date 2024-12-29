@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Security.Cryptography.X509Certificates;
 using BattleBall.Scripts.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,46 +10,37 @@ namespace BattleBall.Scripts.Entities
 {
     public class Button : IUpdateDrawable
     {
-        private readonly Texture2D _texture;
-        private readonly Rectangle _rect;
-        private Color _shade = Color.White;
+        // IUpdateDrawable
         public bool isDisposed { get; private set; }
-        private MouseState mouseState = Mouse.GetState();
-        public event EventHandler OnClick;
-        private bool isClicked;
-        private float alpha;
-        private Text text;
-
+        // IUpdateDrawable
         public bool isVisible { get; set; } = true;
 
+        private Image _image;
+        public Rectangle rect { get => _image.rect; }
+        private MouseState _mouseState = Mouse.GetState();
+        public event EventHandler _OnClick;
+        private Text _text;
+        private bool _isClicked;
 
-        public Button(Texture2D t, Vector2 p, Size s, Text text, EventHandler OnClick)
+        public Button(Image image)
         {
-            _texture = t;
-            _rect = new((int)p.X, (int)p.Y, s.Width, s.Height);
-            this.OnClick = OnClick;
-            this.text = text;
-            AdjustPosition(p, s);
+            _image = image;
         }
 
-        public Button(Texture2D t, Vector2 p, Size s, EventHandler OnClick)
+        public Button(Image image, EventHandler OnClick)
+        : this(image)
         {
-            _texture = t;
-            _rect = new((int)p.X, (int)p.Y, s.Width, s.Height);
-            this.OnClick = OnClick;
+            this._OnClick = OnClick;
         }
 
-        public void AdjustPosition(Vector2 p, Size s)
+        public Button(Image image, EventHandler OnClick, Text text)
+        : this(image, OnClick)
         {
-            Vector2 textMeasure = text.spriteFont.MeasureString(text.text) * text.scale;
-            Vector2 textP = p;
-            textP.X += (s.Width - textMeasure.X) / 2;
-            textP.Y += (s.Height - textMeasure.Y) / 2;
-
-            text.position = textP;
+            _text = text;
+            _text.AdjustCenterPosition(image.rect);
         }
 
-        Vector2 GetPositionMouse() => new(mouseState.X, mouseState.Y);
+        Vector2 GetPositionMouse() => new(_mouseState.X, _mouseState.Y);
 
         bool Intersect(Vector2 pointer, Rectangle rect)
         {
@@ -60,49 +49,47 @@ namespace BattleBall.Scripts.Entities
 
         void HandlerMouseKeyPress()
         {
-            if (mouseState.LeftButton == ButtonState.Pressed)
+            if (_mouseState.LeftButton == ButtonState.Pressed)
             {
-                if (Intersect(GetPositionMouse(), _rect))
+                if (Intersect(GetPositionMouse(), rect))
                     Click();
             }
         }
 
         void HandlerOpacity()
         {
-            if (Intersect(GetPositionMouse(), _rect) && !isClicked)
+            if (Intersect(GetPositionMouse(), rect) && !_isClicked)
             {
-                alpha = 0.5f;
+                _image.alpha = 0.5f;
             }
             else
             {
-                isClicked = false;
-                alpha = 1f;
+                _isClicked = false;
+                _image.alpha = 1f;
             }
         }
 
         public void Update(GameTime gameTime)
         {
-            mouseState = Mouse.GetState();
+            _mouseState = Mouse.GetState();
             HandlerOpacity();
             HandlerMouseKeyPress();
         }
 
         private void Click()
         {
-            isClicked = true;
-            OnClick?.Invoke(this, EventArgs.Empty);
+            _isClicked = true;
+            _OnClick?.Invoke(this, EventArgs.Empty);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_texture, _rect, Color.White * alpha);
-            if (text != null)
-                text.Draw(spriteBatch);
+            _image.Draw(spriteBatch);
+            if (_text != null)
+                _text.Draw(spriteBatch);
         }
 
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+        // IUpdateDrawable
+        public void Dispose() { }
     }
 }

@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BattleBall.Scripts.Entities;
 using BattleBall.Scripts.Events;
 using BattleBall.Scripts.Interfaces;
@@ -35,7 +32,7 @@ namespace BattleBall.Scripts.Scene
             Texture2D about = Content.Load<Texture2D>("textures/about");
             Texture2D logo = Content.Load<Texture2D>("textures/project-logo");
 
-            var panel = new Panel(panelPNG, new(163, 40, 1113, 300), Color.White);
+            var panel = new Panel(new Image(panelPNG, Color.White, new Rectangle(163, 40, 1113, 300)));
 
             panel.AddTexts(new List<Text>()
             {
@@ -48,9 +45,9 @@ namespace BattleBall.Scripts.Scene
 
             _elements.AddRange(new List<IUpdateDrawable>()
             {
-                new Image(logo, new(205, 903, 92, 92), Color.White),
-                new Image(about, new(71, 903, 92, 92), Color.White),
-                new Button(button, new(1105, 916), new(270, 60), new(montserratBold, "Return", Color.Black, 1f, true), eventAbout.OnReturn),
+                new Image(logo, Color.White, new Rectangle(205, 903, 92, 92)),
+                new Image(about, Color.White,  new Rectangle(71, 903, 92, 92)),
+                new Button(new Image(button, Color.White, new Rectangle(1105, 916, 270, 60)), eventAbout.OnReturn, new Text(montserratBold, "Return", Color.Black, 1f, true)),
                 panel,
 
             });

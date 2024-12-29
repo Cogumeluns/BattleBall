@@ -54,7 +54,7 @@ namespace BattleBall.Scripts.Scene
 
             controllerBallLight = new(_collisionComponent, _tempElements, field, player1, player2);
 
-            timer = new Timer(Content.Load<SpriteFont>("fonts/montserratbold"), new(width / 2, 5), player1, player2);
+            timer = new Timer(new Text(Content.Load<SpriteFont>("fonts/montserratbold"), "", Color.White, 1f, true, new Vector2(width / 2, 5)), player1, player2);
 
             _collisionComponent.Insert(player1);
             _collisionComponent.Insert(player2);
@@ -130,8 +130,8 @@ namespace BattleBall.Scripts.Scene
                 _tempElements.AddRange(new List<IUpdateDrawable>()
                 {
                     new Text(modak, text, color, 1f, true, new((int)((width - modak.MeasureString(text).X)/2), 100)),
-                    new Button(button, new(187, 780), new(310, 80), new Text(montserratBold, "Play Again", Color.Black, 1f, true), eventGameMode.OnPlayAgain),
-                    new Button(button, new(942, 780), new(310, 80), new Text(montserratBold, "Main Menu", Color.Black, 1f, true), eventGameMode.OnMainMenu),
+                    new Button(new Image(button, Color.White, new Rectangle(187, 780, 310, 80)), eventGameMode.OnPlayAgain, new Text(montserratBold, "Play Again", Color.Black, 1f, true)),
+                    new Button(new Image(button, Color.White, new Rectangle(942, 780, 310, 80)), eventGameMode.OnMainMenu, new Text(montserratBold, "Main Menu", Color.Black, 1f, true)),
                 });
             }
         }

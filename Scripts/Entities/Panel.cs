@@ -15,26 +15,22 @@ namespace BattleBall.Scripts.Entities
 
         private List<IUpdateDrawable> _elements = new();
 
-        private Texture2D texture2D;
-        private Rectangle rect;
-        private Color colorBackground;
+        private Image _image;
 
-        public Panel(Texture2D texture2D, Rectangle rect, Color color)
+        public Panel(Image image)
         {
-            this.texture2D = texture2D;
-            this.rect = rect;
-            this.colorBackground = color;
+            _image = image;
         }
 
         public void AddTexts(List<Text> texts, float spacing)
         {
-            float currentY = rect.Y;
+            float currentY = _image.rect.Y;
 
             foreach (var item in texts)
             {
                 Vector2 textMeasure = item.spriteFont.MeasureString(item.text) * item.scale;
 
-                item.position += new Vector2(rect.X + 54, currentY + 33);
+                item.position += new Vector2(_image.rect.X + 54, currentY + 33);
 
                 currentY += textMeasure.Y + spacing;
 
@@ -42,19 +38,14 @@ namespace BattleBall.Scripts.Entities
             }
         }
 
-        public void Dispose()
-        {
-        }
-
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(texture2D, rect, colorBackground);
+            _image.Draw(spriteBatch);
             _elements.ForEach(x => x.Draw(spriteBatch));
         }
 
-        public void Update(GameTime gameTime)
-        {
-            // Não faz nada.
-        }
+        public void Dispose() { }
+
+        public void Update(GameTime gameTime) { }
     }
 }

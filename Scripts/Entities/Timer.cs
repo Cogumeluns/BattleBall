@@ -8,26 +8,24 @@ namespace BattleBall.Scripts.Entities
 {
     public class Timer : IUpdateDrawable
     {
+        // IUpdateDrawable
         public bool isVisible { get; set; } = true;
+        // IUpdateDrawable
         public bool isDisposed { get; set; } = false;
-
+        private Text _text;
         private float time;
-        private string textTime;
-        public Vector2 Position { get; set; }
         public SpriteFont Font { get; set; }
-        public Color TextColor { get; set; } = Color.White;
         public bool IsFinished { get; private set; } = false;
 
         public List<Player> Players { get; set; } = new();
 
-        public Timer(SpriteFont font, Vector2 position, Player p1, Player p2, float startTime = 300f)
+        public Timer(Text text, Player p1, Player p2, float startTime = 300f)
         {
-            Font = font;
-            Position = position;
+            _text = text;
             time = startTime;
             Players.Add(p1);
             Players.Add(p2);
-            textTime = FormatTime(time);
+            _text.text = FormatTime(time);
         }
 
         public void Finished()
@@ -60,14 +58,12 @@ namespace BattleBall.Scripts.Entities
                 Finished();
             }
 
-            textTime = FormatTime(time);
+            _text.text = FormatTime(time);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            if (!isVisible || Font == null) return;
-
-            spriteBatch.DrawString(Font, textTime, Position, TextColor);
+            _text.Draw(spriteBatch);
         }
 
         private string FormatTime(float time)

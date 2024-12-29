@@ -8,50 +8,41 @@ namespace BattleBall.Scripts.Entities
 {
     public class InputField : IUpdateDrawable
     {
-        // Public properties
-        public Texture2D Texture { get; set; }
-        public string Text { get; private set; } = "";
-        public string PlaceHold { get; private set; } = "IP...";
-        public Rectangle Bounds { get; }
-        public SpriteFont Font { get; }
-        public Color TextColor { get; set; } = Color.Black;
-        public bool IsActive { get; set; } = false;
-        public bool IsDisposed { get; set; }
-
-        // Private fields
-        private float scale = 0.8f;
-        private Vector2 TextPosition { get; set; }
-        private Vector2 PlaceHoldPosition { get; set; }
-
-        public bool isDisposed => throw new NotImplementedException();
-
+        // IUpdateDrawable
+        public bool isDisposed { get; set; }
+        // IUpdateDrawable
         public bool isVisible { get; set; } = true;
+        public const string PLACEHOLD = "IP...";
+        private const int SPACINGLEFT = -150;
 
+        private Button _button;
+        private Text _text;
+        private Text _placeHold;
+
+        // Public properties
+        private string Text
+        {
+            get => _text.text;
+            set => _text.text = value;
+        }
+        public bool IsActive { get; set; } = false;
         private KeyboardState previousKeyboardState = Keyboard.GetState();
-        private readonly Button button;
 
         // Constructor
-        public InputField(Texture2D texture, Rectangle bounds, SpriteFont font)
+        public InputField(Button button, Text text)
         {
-            Texture = texture;
-            Bounds = bounds;
-            Font = font;
+            _button = button;
+            _button._OnClick += OnActive;
+            _text = text;
+            _placeHold = new Text(text.spriteFont, PLACEHOLD, Color.Gray, 1f, true);
 
-            button = new Button(texture, new(bounds.X, bounds.Y), new(bounds.Width, bounds.Height), OnActive);
-            AdjustPlaceHoldPosition();
+            _placeHold.AdjustCenterPosition(_button.rect, SPACINGLEFT, 0);
         }
 
-        // Adjust positions
         private void AdjustTextPosition()
         {
-            Vector2 textMeasure = Font.MeasureString(Text) * scale;
-            TextPosition = new Vector2(Bounds.X + 45, Bounds.Y + (Bounds.Height - textMeasure.Y) / 2);
-        }
-
-        private void AdjustPlaceHoldPosition()
-        {
-            Vector2 textMeasure = Font.MeasureString(PlaceHold) * scale;
-            PlaceHoldPosition = new Vector2(Bounds.X + 45, Bounds.Y + (Bounds.Height - textMeasure.Y) / 2);
+            Vector2 textMeasure = _text.GetMeasureText();
+            _text.position = new Vector2(_button.rect.X + 45, _button.rect.Y + (_button.rect.Height - textMeasure.Y) / 2);
         }
 
         // Events
@@ -68,7 +59,7 @@ namespace BattleBall.Scripts.Entities
         // Update
         public void Update(GameTime gameTime)
         {
-            button.Update(gameTime);
+            _button.Update(gameTime);
 
             if (!IsActive) return;
 
@@ -136,25 +127,25 @@ namespace BattleBall.Scripts.Entities
         // Draw
         public void Draw(SpriteBatch spriteBatch)
         {
-            button.Draw(spriteBatch);
+            _button.Draw(spriteBatch);
 
             if (string.IsNullOrEmpty(Text))
             {
                 DrawPlaceHold(spriteBatch);
             }
+            else
+            {
+                _text.Draw(spriteBatch);
+            }
 
-            spriteBatch.DrawString(Font, Text, TextPosition, TextColor, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
         }
 
         private void DrawPlaceHold(SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawString(Font, PlaceHold, PlaceHoldPosition, Color.Gray, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+            _placeHold.Draw(spriteBatch);
         }
 
         // Dispose
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+        public void Dispose() { }
     }
 }

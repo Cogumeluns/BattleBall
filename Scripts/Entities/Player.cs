@@ -19,19 +19,28 @@ namespace BattleBall.Scripts.Entities
         public IShapeF Bounds { get; set; }
         // IUpdateDrawable -> IBaseDisposable
         public bool isDisposed { get; private set; } = false;
-        public Color color;
-        private Dictionary<PlayerKeys, Keys> playerKeys = new();
+
+        // Lives
+        public int Lives { get; set; }
+        public Vector2[] positionLives = new Vector2[3];
+
+        // Dash Icon Use
+        public Vector2 positionTimerWaitDash = Vector2.Zero;
+
+        // Moviment
         public Vector2 velocitydash = Vector2.Zero;
         public Vector2 velocity = Vector2.Zero;
         public Vector2 pushBackIntensity = Vector2.Zero;
-        public Vector2[] positionHealth = new Vector2[3];
-        public Vector2 timerToUseDash = Vector2.Zero;
-        public int Lives { get; set; }
+
+        // Timers
         public float timeDash = 0;
         public float timeWaitDash = 0;
         public float timePushBackDuration = 0;
-        public bool[] isColliderBorderField = new bool[4]; // TOP, BOTTOM, LEFT, RIGHT
 
+        // Others
+        public Color color;
+        private Dictionary<PlayerKeys, Keys> playerKeys = new();
+        public bool[] isColliderBorderField = new bool[4]; // TOP, BOTTOM, LEFT, RIGHT
         public bool isVisible { get; set; } = true;
         public bool isPlayer1;
 
@@ -67,7 +76,7 @@ namespace BattleBall.Scripts.Entities
         {
             for (int i = 0; i < Lives; i++)
             {
-                positionHealth[i] = new(vector2.X + someX * i, vector2.Y);
+                positionLives[i] = new(vector2.X + someX * i, vector2.Y);
             }
         }
 
@@ -75,11 +84,11 @@ namespace BattleBall.Scripts.Entities
         {
             if (isPlayer1)
             {
-                timerToUseDash = new(650, 25);
+                positionTimerWaitDash = new(650, 25);
             }
             else
             {
-                timerToUseDash = new(900, 25);
+                positionTimerWaitDash = new(900, 25);
             }
         }
 
@@ -97,14 +106,14 @@ namespace BattleBall.Scripts.Entities
             CircleF circle;
             for (int i = 0; i < Lives; i++)
             {
-                circle = new(positionHealth[i], 15);
+                circle = new(positionLives[i], 15);
                 spriteBatch.DrawCircle(circle, Physics.SIDES, color, circle.Radius);
             }
         }
 
         void DrawDash(SpriteBatch spriteBatch)
         {
-            CircleF circle = new(timerToUseDash, 15);
+            CircleF circle = new(positionTimerWaitDash, 15);
             spriteBatch.DrawCircle(circle, Physics.SIDES, timeWaitDash <= 0 ? color : Color.Black, circle.Radius);
         }
 

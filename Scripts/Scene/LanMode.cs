@@ -6,6 +6,7 @@ using BattleBall.Scripts.Events;
 using BattleBall.Scripts.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Screens;
 
 public class LanMode : GameScreen
@@ -33,27 +34,30 @@ public class LanMode : GameScreen
         Texture2D cicle = Content.Load<Texture2D>("textures/about");
         Texture2D rectangle = Content.Load<Texture2D>("textures/rectangle");
 
+        Keys[] p1 = { Keys.W, Keys.S, Keys.A, Keys.D, Keys.Space };
+        Keys[] p2 = { Keys.Up, Keys.Down, Keys.Left, Keys.Right, Keys.NumPad0 };
+
         _elements.AddRange(new List<IUpdateDrawable>()
         {
-            new Image(cicle, new(310, 80, 160, 160), new(81, 125, 201)),
-            new Text(montserratBold, " W ", Color.Black, 1f, true, new(365, 300), rectangle, Color.White),
-            new Text(montserratBold, " S ", Color.Black, 1f, true, new(365, 370), rectangle, Color.White),
-            new Text(montserratBold, " A", Color.Black, 1f, true, new(365, 440), rectangle, Color.White),
-            new Text(montserratBold, " D ", Color.Black, 1f, true, new(365, 510), rectangle, Color.White),
-            new Text(montserratBold, " Space ", Color.Black, 1f, true, new(365, 580), rectangle, Color.White),
+            new Image(cicle, new Color(81, 125, 201), new Rectangle(310, 80, 160, 160)),
+            new Text(montserratBold, p1[0].ToString(), Color.White, 1f, true, new Vector2(365, 300)),
+            new Text(montserratBold, p1[1].ToString(), Color.White, 1f, true, new Vector2(365, 370)),
+            new Text(montserratBold, p1[2].ToString(), Color.White, 1f, true, new Vector2(365, 440)),
+            new Text(montserratBold, p1[3].ToString(), Color.White, 1f, true, new Vector2(365, 510)),
+            new Text(montserratBold, p1[4].ToString(), Color.White, 1f, true, new Vector2(365, 580)),
 
-            new Text(montserratBold, " Up ", Color.Black, 1f, true, new(700, 300), rectangle, Color.White),
-            new Text(montserratBold, " Down ", Color.Black, 1f, true, new(700, 370), rectangle, Color.White),
-            new Text(montserratBold, " Left", Color.Black, 1f, true, new(700, 440), rectangle, Color.White),
-            new Text(montserratBold, " Right ", Color.Black, 1f, true, new(700, 510), rectangle, Color.White),
-            new Text(montserratBold, " Dash ", Color.Black, 1f, true, new(700, 580), rectangle, Color.White),
+            new Text(montserratBold, "Up", Color.White, 1f, true, new Vector2(720, 300)),
+            new Text(montserratBold, "Down", Color.White, 1f, true, new Vector2(700, 370)),
+            new Text(montserratBold, "Left", Color.White, 1f, true, new Vector2(715, 440)),
+            new Text(montserratBold, "Right", Color.White, 1f, true, new Vector2(700, 510)),
+            new Text(montserratBold, "Dash", Color.White, 1f, true, new Vector2(700, 580)),
 
-            new Image(cicle, new(1003, 80, 160, 160), new(255, 106, 106)),
-            new Text(montserratBold, " Up ", Color.Black, 1f, true, new(1058, 300), rectangle, Color.White),
-            new Text(montserratBold, " Down ", Color.Black, 1f, true, new(1058, 370), rectangle, Color.White),
-            new Text(montserratBold, " Left ", Color.Black, 1f, true, new(1058, 440), rectangle, Color.White),
-            new Text(montserratBold, " Right ", Color.Black, 1f, true, new(1058, 510), rectangle, Color.White),
-            new Text(montserratBold, " 0 ", Color.Black, 1f, true, new(1058, 580), rectangle, Color.White),
+            new Image(cicle, new Color(255, 106, 106), new Rectangle(1003, 80, 160, 160)),
+            new Text(montserratBold, p2[0].ToString(), Color.White, 1f, true, new(1058, 300)),
+            new Text(montserratBold, p2[1].ToString(), Color.White, 1f, true, new(1058, 370)),
+            new Text(montserratBold, p2[2].ToString(), Color.White, 1f, true, new(1058, 440)),
+            new Text(montserratBold, p2[3].ToString(), Color.White, 1f, true, new(1058, 510)),
+            new Text(montserratBold, p2[4].ToString(), Color.White, 1f, true, new(1058, 580)),
         });
 
         if (isMaster)
@@ -66,7 +70,8 @@ public class LanMode : GameScreen
 
     private void OnLoadContentClient(Texture2D button, SpriteFont montserratRegular, SpriteFont montserratBold)
     {
-        _elements.Add(new InputField(button, new(500, 773, 440, 78), montserratRegular));
+        _elements.Add(new InputField(new Button(new Image(button, Color.White, new Rectangle(500, 773, 440, 78))),
+        new Text(montserratRegular, "", Color.Black, 1f, true)));
 
         int xFailure = (int)((Game._graphics.PreferredBackBufferWidth - montserratBold.MeasureString("Failure").X) / 2);
         int xConnect = (int)((Game._graphics.PreferredBackBufferWidth - montserratBold.MeasureString("Connected").X) / 2);
@@ -82,7 +87,7 @@ public class LanMode : GameScreen
 
     private void OnLoadContentMaster(Texture2D button, SpriteFont montserratRegular, SpriteFont montserratBold)
     {
-        _elements.Add(new Button(button, new(1083, 900), new(310, 80), new Text(montserratBold, "START", Color.Black, 1f, true), eventLanMode.OnStartGameMode));
+        _elements.Add(new Button(new Image(button, Color.White, new Rectangle(1083, 900, 310, 80)), eventLanMode.OnStartGameMode, new Text(montserratBold, "START", Color.Black, 1f, true)));
 
         int xWainting = (int)((Game._graphics.PreferredBackBufferWidth - montserratBold.MeasureString("Waiting...").X) / 2);
         int xConnect = (int)((Game._graphics.PreferredBackBufferWidth - montserratBold.MeasureString("Connected").X) / 2);

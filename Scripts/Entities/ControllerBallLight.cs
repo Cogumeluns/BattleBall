@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BattleBall.Scripts.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -11,17 +9,18 @@ namespace BattleBall.Scripts.Entities
 {
     public class ControllerBallLight : IUpdateDrawable
     {
+        // IUpdateDrawable
         public bool isDisposed { get; private set; } = false;
-
-        private readonly Random _random = new();
-        CollisionComponent _collisionComponent;
-        List<IUpdateDrawable> _tempUpdateDrawables;
-        List<Player> _players = new();
-        Field _field = null;
-
-        BallLight _ballLight = null;
-        public bool _isExecute = false;
+        // IUpdateDrawable
         public bool isVisible { get; set; } = true;
+
+        private const float RADIUS = 30f;
+        private readonly Random _random = new();
+        private CollisionComponent _collisionComponent;
+        private List<IUpdateDrawable> _tempUpdateDrawables;
+        private List<Player> _players = new();
+        private Field _field = null;
+        private BallLight _ballLight = null;
 
         public ControllerBallLight(CollisionComponent collisionComponent, List<IUpdateDrawable> updateDrawables,
         Field field, Player p1, Player p2)
@@ -41,11 +40,6 @@ namespace BattleBall.Scripts.Entities
             isDisposed = true;
         }
 
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            // Nenhuma lógica de desenho necessária no momento
-        }
-
         public void Update(GameTime gameTime)
         {
             if (_ballLight == null)
@@ -56,15 +50,13 @@ namespace BattleBall.Scripts.Entities
 
         private void CreateBallLight()
         {
-            // Gera posições aleatórias dentro dos limites do campo
-            float x = _random.Next((int)(_field.Bounds.BoundingRectangle.Left + _field.thickness + 30),
-                                   (int)(_field.Bounds.BoundingRectangle.Right - _field.thickness - 30));
-            float y = _random.Next((int)(_field.Bounds.BoundingRectangle.Top + _field.thickness + 30),
-                                   (int)(_field.Bounds.BoundingRectangle.Bottom - _field.thickness - 30));
+            float x = _random.Next((int)(_field.Bounds.BoundingRectangle.Left + _field.thickness + RADIUS),
+                                   (int)(_field.Bounds.BoundingRectangle.Right - _field.thickness - RADIUS));
+            float y = _random.Next((int)(_field.Bounds.BoundingRectangle.Top + _field.thickness + RADIUS),
+                                   (int)(_field.Bounds.BoundingRectangle.Bottom - _field.thickness - RADIUS));
 
-            _ballLight = new BallLight(new(new(x, y), 30), Color.Yellow, _players, this);
+            _ballLight = new BallLight(new(new(x, y), RADIUS), Color.Yellow, _players, this);
 
-            // Insere a bola no sistema de colisão e atualização
             _collisionComponent.Insert(_ballLight);
             _tempUpdateDrawables.Add(_ballLight);
         }
@@ -77,5 +69,7 @@ namespace BattleBall.Scripts.Entities
                 _ballLight = null;
             }
         }
+
+        public void Draw(SpriteBatch spriteBatch) { }
     }
 }
