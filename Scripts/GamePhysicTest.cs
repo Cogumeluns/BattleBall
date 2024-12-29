@@ -42,10 +42,10 @@ public class GamePhysicTest : Game
     {
         // TODO: Add your initialization logic here
 
-        player1 = new(new(new(GameBounds.X / 4, GameBounds.Y / 2), 30), Color.Blue);
+        player1 = new(new(new(GameBounds.X / 4, GameBounds.Y / 2), 30), Color.Blue, true);
         player1.SetKeys(Keys.W, Keys.S, Keys.A, Keys.D, Keys.Q);
 
-        player2 = new(new(new(GameBounds.X - (GameBounds.X / 4), GameBounds.Y / 2), 30), Color.Red);
+        player2 = new(new(new(GameBounds.X - (GameBounds.X / 4), GameBounds.Y / 2), 30), Color.Red, false);
         player2.SetKeys(Keys.Up, Keys.Down, Keys.Left, Keys.Right, Keys.E);
 
         field = new(new(new(50, 50), new(GameBounds.X - 100, GameBounds.Y - 100)), Color.White);

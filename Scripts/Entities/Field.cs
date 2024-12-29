@@ -13,6 +13,7 @@ namespace BattleBall.Scripts.Entities
 {
     public class Field : ICollisionActor, IUpdateDrawable
     {
+        public bool isVisible { get; set; } = true;
         private const int DISTANCE_TO_BOUND = 5;
         // ICollisionActor
         public IShapeF Bounds { get; set; }
