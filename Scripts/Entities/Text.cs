@@ -20,30 +20,26 @@ namespace BattleBall.Scripts.Entities
         public float scale;
         public bool isDisposed { get; set; }
 
-        public Text(SpriteFont spriteFont, string text, Color color, float scale)
+        public bool isVisible;
+
+        public Text(SpriteFont spriteFont, string text, Color color, float scale, bool isVisible)
         {
             this.spriteFont = spriteFont;
             this.text = text;
             this.color = color;
             this.scale = scale;
+            this.isVisible = isVisible;
         }
 
-        public Text(SpriteFont spriteFont, string text, Vector2 position, Color color, float scale)
+        public Text(SpriteFont spriteFont, string text, Color color, float scale, bool isVisible, Vector2 position)
+        : this(spriteFont, text, color, scale, isVisible)
         {
-            this.spriteFont = spriteFont;
-            this.text = text;
             this.position = position;
-            this.color = color;
-            this.scale = scale;
         }
 
-        public Text(SpriteFont spriteFont, string text, Vector2 position, Color color, float scale, Texture2D textureBackground, Color colorBackground)
+        public Text(SpriteFont spriteFont, string text, Color color, float scale, bool isVisible, Vector2 position, Texture2D textureBackground, Color colorBackground)
+        : this(spriteFont, text, color, scale, isVisible, position)
         {
-            this.spriteFont = spriteFont;
-            this.text = text;
-            this.position = position;
-            this.color = color;
-            this.scale = scale;
             this.colorBackground = colorBackground;
             texture2D = textureBackground;
             AdjustPosition();

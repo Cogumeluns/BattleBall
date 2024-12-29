@@ -33,6 +33,16 @@
 #begin fonts/montserratbold.ttf
 /copy:fonts/montserratbold.ttf
 
+#begin fonts/montserratitalic.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/montserratitalic.spritefont
+
+#begin fonts/montserratitalic.ttf
+/copy:fonts/montserratitalic.ttf
+
 #begin fonts/montserratregular.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -42,6 +52,18 @@
 
 #begin fonts/montserratregular.ttf
 /copy:fonts/montserratregular.ttf
+
+#begin textures/about.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:textures/about.png
 
 #begin textures/button.png
 /importer:TextureImporter
@@ -78,4 +100,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:textures/project-logo.png
+
+#begin textures/rectangle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:textures/rectangle.png
 

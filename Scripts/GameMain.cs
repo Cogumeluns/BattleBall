@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
 using MonoGame.Extended.Screens;
 
 namespace BattleBall;
@@ -9,11 +10,15 @@ public class GameMain : Game
 {
     private GraphicsDeviceManager _graphics;
     public SpriteBatch SpriteBatch;
+
+    public Size GameBound = new(1440, 1024);
     public readonly GameSceneManager gameSceneManager;
 
     public GameMain()
     {
         _graphics = new GraphicsDeviceManager(this);
+        _graphics.PreferredBackBufferWidth = GameBound.Width;
+        _graphics.PreferredBackBufferHeight = GameBound.Height;
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
 
@@ -26,7 +31,7 @@ public class GameMain : Game
     {
         // TODO: Add your initialization logic here
 
-        gameSceneManager.LoadScene(Scene.MAIN_MENU);
+        gameSceneManager.LoadScene(Scene.LAN_MODE);
 
         base.Initialize();
     }

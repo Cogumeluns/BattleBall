@@ -1,4 +1,5 @@
 using BattleBall;
+using BattleBall.Scripts.Scene;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Screens;
@@ -22,8 +23,14 @@ public class GameSceneManager
             case Scene.MAIN_MENU:
                 _screenManager.LoadScreen(new MainMenu(_game), new FadeTransition(_game.GraphicsDevice, Color.Black));
                 break;
-            case Scene.SCENE_2:
-                _screenManager.LoadScreen(new Scene2(_game), new FadeTransition(_game.GraphicsDevice, Color.Black));
+            case Scene.LOCAL_MODE:
+                _screenManager.LoadScreen(new LocalMode(_game), new FadeTransition(_game.GraphicsDevice, Color.Black));
+                break;
+            case Scene.LAN_MODE:
+                _screenManager.LoadScreen(new LanMode(_game), new FadeTransition(_game.GraphicsDevice, Color.Black));
+                break;
+            case Scene.ABOUT:
+                _screenManager.LoadScreen(new About(_game), new FadeTransition(_game.GraphicsDevice, Color.Black));
                 break;
         }
     }
@@ -31,5 +38,5 @@ public class GameSceneManager
 
 public enum Scene
 {
-    MAIN_MENU, SCENE_2
+    MAIN_MENU, LAN_MODE, LOCAL_MODE, ABOUT
 }

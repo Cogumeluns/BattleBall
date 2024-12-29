@@ -33,7 +33,7 @@ namespace BattleBall.Scripts.Entities
             {
                 Vector2 textMeasure = item.spriteFont.MeasureString(item.text) * item.scale;
 
-                item.position += new Vector2(rect.X + 30, currentY + 10);
+                item.position += new Vector2(rect.X + 54, currentY + 33);
 
                 currentY += textMeasure.Y + spacing;
 

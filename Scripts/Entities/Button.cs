@@ -32,6 +32,13 @@ namespace BattleBall.Scripts.Entities
             AdjustPosition(p, s);
         }
 
+        public Button(Texture2D t, Vector2 p, Size s, EventHandler OnClick)
+        {
+            _texture = t;
+            _rect = new((int)p.X, (int)p.Y, s.Width, s.Height);
+            this.OnClick = OnClick;
+        }
+
         public void AdjustPosition(Vector2 p, Size s)
         {
             Vector2 textMeasure = text.spriteFont.MeasureString(text.text) * text.scale;
