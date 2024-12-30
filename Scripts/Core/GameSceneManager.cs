@@ -18,6 +18,7 @@ public class GameSceneManager
 
     public void LoadScene(Scene scene)
     {
+        _game.mix.scene = scene;
         switch (scene)
         {
             case Scene.MAIN_MENU:

@@ -8,6 +8,7 @@ using BattleBall.Scripts.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Collisions;
 using MonoGame.Extended.Screens;
 
@@ -21,7 +22,6 @@ namespace BattleBall.Scripts.Scene
         public bool isDisposed { get; private set; }
 
         private CollisionComponent _collisionComponent;
-
         List<IUpdateDrawable> _elements = new();
         List<IUpdateDrawable> _tempElements = new();
 
