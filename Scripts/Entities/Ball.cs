@@ -41,7 +41,7 @@ namespace BattleBall.Scripts.Entities
             UpdateMovement(deltaTime);
             velocity = DecreaseVelocity(deltaTime, velocity, false);
             velocityField = DecreaseVelocity(deltaTime, velocityField, true);
-        }
+        } 
 
         void UpdateMovement(float deltaTime)
         {

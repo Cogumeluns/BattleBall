@@ -19,7 +19,7 @@ namespace BattleBall.Scripts.Entities
         List<Player> _players = new();
         Field _field = null;
 
-        BallLight _ballLight = null;
+        public BallLight ballLight = null;
         public bool _isExecute = false;
 
         public ControllerBallLight(CollisionComponent collisionComponent, List<IUpdateDrawable> updateDrawables,
@@ -47,7 +47,7 @@ namespace BattleBall.Scripts.Entities
 
         public void Update(GameTime gameTime)
         {
-            if (_ballLight == null)
+            if (ballLight == null)
             {
                 CreateBallLight();
             }
@@ -61,19 +61,19 @@ namespace BattleBall.Scripts.Entities
             float y = _random.Next((int)(_field.Bounds.BoundingRectangle.Top + _field.thickness),
                                    (int)(_field.Bounds.BoundingRectangle.Bottom - _field.thickness));
 
-            _ballLight = new BallLight(new(new(x, y), 30), Color.Yellow, _players, this);
+            ballLight = new BallLight(new(new(x, y), 30), Color.Yellow, _players, this);
 
             // Insere a bola no sistema de colisão e atualização
-            _collisionComponent.Insert(_ballLight);
-            _tempUpdateDrawables.Add(_ballLight);
+            _collisionComponent.Insert(ballLight);
+            _tempUpdateDrawables.Add(ballLight);
         }
 
         public void DestroyBallLight()
         {
-            if (_ballLight != null)
+            if (ballLight != null)
             {
-                _ballLight.Dispose();
-                _ballLight = null;
+                ballLight.Dispose();
+                ballLight = null;
             }
         }
     }

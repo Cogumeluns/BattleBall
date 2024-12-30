@@ -24,6 +24,11 @@ public class Scene2 : GameScreen
     public override void Update(GameTime gameTime)
     {
         _position = Vector2.Lerp(_position, Mouse.GetState().Position.ToVector2(), 1f * gameTime.GetElapsedSeconds());
+        KeyboardState keyboardState = Keyboard.GetState();
+        if (keyboardState.IsKeyDown(Keys.Up))
+        {
+            Game.gameSceneManager.LoadScene(Scene.SCENE_1);
+        }
     }
 
     public override void Draw(GameTime gameTime)

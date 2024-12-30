@@ -46,13 +46,6 @@ public class GameMain : Game
         KeyboardState keyboardState = Keyboard.GetState();
         if (keyboardState.IsKeyDown(Keys.Escape))
             Exit();
-        if (keyboardState.IsKeyDown(Keys.Down))
-        {
-            gameSceneManager.LoadScene(Scene.SCENE_1);
-        } else if (keyboardState.IsKeyDown(Keys.Up))
-        {
-            gameSceneManager.LoadScene(Scene.SCENE_2);
-        }
         base.Update(gameTime);
     }
 
