@@ -22,7 +22,7 @@ public class LanMode : GameScreen
         if (isMaster)
         {
             RunServer();
-        }
+    }
     }
 
     List<IUpdateDrawable> _elements = new();

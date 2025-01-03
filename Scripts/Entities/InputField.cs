@@ -76,6 +76,7 @@ namespace BattleBall.Scripts.Entities
                 }
             }
 
+            AdjustTextPosition();
             previousKeyboardState = keyboardState;
         }
 
@@ -113,7 +114,10 @@ namespace BattleBall.Scripts.Entities
 
         private void AddCharacter(char c)
         {
-            Text += c;
+            if (ValidateIP(Text + c))
+            {
+                Text += c;
+            }
         }
 
         private bool ValidateIP(string ip)

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BattleBall.Scripts.Entities;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
@@ -14,6 +15,7 @@ public class GameMain : Game
 
     public Size GameBound = new(1440, 1024);
     public readonly GameSceneManager gameSceneManager;
+    public Mix mix;
 
     public GameMain()
     {
@@ -26,6 +28,7 @@ public class GameMain : Game
         var _screenManager = new ScreenManager();
         gameSceneManager = new GameSceneManager(this, _screenManager);
         Components.Add(_screenManager);
+        mix = new Mix(this);
     }
 
     protected override void Initialize()
@@ -33,6 +36,7 @@ public class GameMain : Game
         // TODO: Add your initialization logic here
 
         gameSceneManager.LoadScene(Scene.MAIN_MENU);
+
 
         base.Initialize();
     }

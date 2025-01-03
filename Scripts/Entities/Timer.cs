@@ -57,6 +57,8 @@ namespace BattleBall.Scripts.Entities
                 IsFinished = true;
                 Finished();
             }
+
+            _text.text = FormatTime(time);
         }
 
         public void Draw(SpriteBatch spriteBatch)

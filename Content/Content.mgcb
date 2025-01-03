@@ -53,6 +53,18 @@
 #begin fonts/montserratregular.ttf
 /copy:fonts/montserratregular.ttf
 
+#begin mix/battle.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:mix/battle.mp3
+
+#begin mix/menu.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:mix/menu.mp3
+
 #begin textures/about.png
 /importer:TextureImporter
 /processor:TextureProcessor
