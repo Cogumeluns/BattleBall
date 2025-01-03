@@ -39,6 +39,15 @@ public class MainMenu : GameScreen
 
     public override void Initialize()
     {
+        GameStatics.isMaster = false;
+        GameStatics.isConnectedClient = false;
+        GameStatics.connection = null;
+        if (GameStatics.process != null)
+        {
+            GameStatics.process.Kill();
+            GameStatics.process = null;
+        }
+
         base.Initialize();
     }
     public override void Update(GameTime gameTime)

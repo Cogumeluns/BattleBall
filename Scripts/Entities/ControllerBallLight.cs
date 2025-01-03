@@ -16,11 +16,12 @@ namespace BattleBall.Scripts.Entities
 
         private const float RADIUS = 30f;
         private readonly Random _random = new();
-        private CollisionComponent _collisionComponent;
-        private List<IUpdateDrawable> _tempUpdateDrawables;
-        private List<Player> _players = new();
-        private Field _field = null;
-        private BallLight _ballLight = null;
+        CollisionComponent _collisionComponent;
+        List<IUpdateDrawable> _tempUpdateDrawables;
+        List<Player> _players = new();
+        Field _field = null;
+
+        public BallLight ballLight = null;
 
         public ControllerBallLight(CollisionComponent collisionComponent, List<IUpdateDrawable> updateDrawables,
         Field field, Player p1, Player p2)
@@ -42,7 +43,7 @@ namespace BattleBall.Scripts.Entities
 
         public void Update(GameTime gameTime)
         {
-            if (_ballLight == null)
+            if (ballLight == null)
             {
                 CreateBallLight();
             }
@@ -55,18 +56,19 @@ namespace BattleBall.Scripts.Entities
             float y = _random.Next((int)(_field.Bounds.BoundingRectangle.Top + _field.thickness + RADIUS),
                                    (int)(_field.Bounds.BoundingRectangle.Bottom - _field.thickness - RADIUS));
 
-            _ballLight = new BallLight(new(new(x, y), RADIUS), Color.Yellow, _players, this);
+            ballLight = new BallLight(new(new(x, y), RADIUS), Color.Yellow, _players, this);
 
-            _collisionComponent.Insert(_ballLight);
-            _tempUpdateDrawables.Add(_ballLight);
+            // Insere a bola no sistema de colisão e atualização
+            _collisionComponent.Insert(ballLight);
+            _tempUpdateDrawables.Add(ballLight);
         }
 
         public void DestroyBallLight()
         {
-            if (_ballLight != null)
+            if (ballLight != null)
             {
-                _ballLight.Dispose();
-                _ballLight = null;
+                ballLight.Dispose();
+                ballLight = null;
             }
         }
 

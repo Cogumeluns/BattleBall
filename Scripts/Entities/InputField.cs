@@ -16,24 +16,26 @@ namespace BattleBall.Scripts.Entities
         private const int SPACINGLEFT = -150;
 
         private Button _button;
-        private Text _text;
+        public Text text;
         private Text _placeHold;
+        private event EventHandler _OnEndEdit;
 
         // Public properties
         private string Text
         {
-            get => _text.text;
-            set => _text.text = value;
+            get => text.text;
+            set => text.text = value;
         }
         public bool IsActive { get; set; } = false;
         private KeyboardState previousKeyboardState = Keyboard.GetState();
 
         // Constructor
-        public InputField(Button button, Text text)
+        public InputField(Button button, Text text, EventHandler OnEndEdit)
         {
             _button = button;
             _button._OnClick += OnActive;
-            _text = text;
+            this._OnEndEdit = OnEndEdit;
+            this.text = text;
             _placeHold = new Text(text.spriteFont, PLACEHOLD, Color.Gray, 1f, true);
 
             _placeHold.AdjustCenterPosition(_button.rect, SPACINGLEFT, 0);
@@ -41,8 +43,8 @@ namespace BattleBall.Scripts.Entities
 
         private void AdjustTextPosition()
         {
-            Vector2 textMeasure = _text.GetMeasureText();
-            _text.position = new Vector2(_button.rect.X + 45, _button.rect.Y + (_button.rect.Height - textMeasure.Y) / 2);
+            Vector2 textMeasure = text.GetMeasureText();
+            text.position = new Vector2(_button.rect.X + 45, _button.rect.Y + (_button.rect.Height - textMeasure.Y) / 2);
         }
 
         // Events
@@ -54,6 +56,7 @@ namespace BattleBall.Scripts.Entities
         private void OnEndEdit()
         {
             // Event to handle end of input (e.g., send to server)
+            _OnEndEdit?.Invoke(this, EventArgs.Empty);
         }
 
         // Update
@@ -83,6 +86,15 @@ namespace BattleBall.Scripts.Entities
             {
                 Text = Text[..^1];
             }
+            else if (key == Keys.Enter)
+            {
+                IsActive = false;
+                OnEndEdit();
+            }
+            else if (text.text.Length >= 20)
+            {
+                return;
+            }
             else if (key >= Keys.D0 && key <= Keys.D9)
             {
                 AddCharacter(key.ToString()[1]);
@@ -94,11 +106,9 @@ namespace BattleBall.Scripts.Entities
             else if (key == Keys.OemPeriod || key == Keys.Decimal)
             {
                 AddCharacter('.');
-            }
-            else if (key == Keys.Enter)
+            } else
             {
-                IsActive = false;
-                OnEndEdit();
+                AddCharacter(key.ToString()[0]);
             }
         }
 
@@ -135,7 +145,8 @@ namespace BattleBall.Scripts.Entities
             }
             else
             {
-                _text.Draw(spriteBatch);
+                AdjustTextPosition();
+                text.Draw(spriteBatch);
             }
 
         }

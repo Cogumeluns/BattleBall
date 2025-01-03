@@ -13,7 +13,7 @@ namespace BattleBall.Scripts.Entities
         // IUpdateDrawable
         public bool isDisposed { get; set; } = false;
         private Text _text;
-        private float time;
+        public float time;
         public SpriteFont Font { get; set; }
         public bool IsFinished { get; private set; } = false;
 
@@ -63,6 +63,7 @@ namespace BattleBall.Scripts.Entities
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            _text.text = FormatTime(time);
             _text.Draw(spriteBatch);
         }
 

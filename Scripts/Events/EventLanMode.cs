@@ -15,7 +15,9 @@ namespace BattleBall.Scripts.Events
 
         public void OnStartGameMode(object sender, EventArgs e)
         {
-            lanMode.Game.gameSceneManager.LoadScene(global::Scene.GAME_MODE);
+            Task.Run(async () => {
+                await GameStatics.connection.SendOpenLanMode();
+            });
         }
     }
 }

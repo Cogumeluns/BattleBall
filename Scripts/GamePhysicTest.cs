@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using BattleBall.Scripts.Entities;
+using BattleBall.Scripts.Enum;
 using BattleBall.Scripts.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -11,6 +14,10 @@ namespace BattleBall;
 
 public class GamePhysicTest : Game
 {
+    public Connection Connection = new Connection(new GameMain());
+    bool isLan = true;
+    bool isMaster = true;
+
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
@@ -20,7 +27,7 @@ public class GamePhysicTest : Game
 
     List<IUpdateDrawable> updateDrawables = new();
     List<IUpdateDrawable> tempUpdateDrawables = new();
-
+ 
     Player player1;
     Player player2;
     Ball ball;
@@ -41,12 +48,41 @@ public class GamePhysicTest : Game
     protected override void Initialize()
     {
         // TODO: Add your initialization logic here
-
         player1 = new(new(new(GameBounds.X / 4, GameBounds.Y / 2), 30), Color.Blue, true);
-        player1.SetKeys(Keys.W, Keys.S, Keys.A, Keys.D, Keys.Q);
+        var player1ListMovEvents = new Dictionary<PlayerKeys, Func<KeyboardState, bool>>()
+        {
+            { PlayerKeys.Up, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.W) },
+            { PlayerKeys.Down, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.S) },
+            { PlayerKeys.Left, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.A) },
+            { PlayerKeys.Right, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.D) },
+            { PlayerKeys.Dash, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.Space) }
+        }; 
+        player1.SetKeys(player1ListMovEvents);
 
         player2 = new(new(new(GameBounds.X - (GameBounds.X / 4), GameBounds.Y / 2), 30), Color.Red, false);
-        player2.SetKeys(Keys.Up, Keys.Down, Keys.Left, Keys.Right, Keys.E);
+        var player2ListMovEvents = new Dictionary<PlayerKeys, Func<KeyboardState, bool>>();
+        if (isLan && isMaster)
+        {
+            player2ListMovEvents = new Dictionary<PlayerKeys, Func<KeyboardState, bool>>()
+            {
+                { PlayerKeys.Up, (KeyboardState keyboardState) => Connection.KeyP2InfoDto.player2Keys[0] },
+                { PlayerKeys.Down, (KeyboardState keyboardState) => Connection.KeyP2InfoDto.player2Keys[1] },
+                { PlayerKeys.Left, (KeyboardState keyboardState) => Connection.KeyP2InfoDto.player2Keys[2] },
+                { PlayerKeys.Right, (KeyboardState keyboardState) => Connection.KeyP2InfoDto.player2Keys[3] },
+                { PlayerKeys.Dash, (KeyboardState keyboardState) => Connection.KeyP2InfoDto.player2Keys[4] }
+            };
+        } else {
+            player2ListMovEvents = new Dictionary<PlayerKeys, Func<KeyboardState, bool>>()
+            {
+                { PlayerKeys.Up, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.Up) },
+                { PlayerKeys.Down, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.Down) },
+                { PlayerKeys.Left, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.Left) },
+                { PlayerKeys.Right, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.Right) },
+                { PlayerKeys.Dash, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.NumPad0) }
+            };
+        }
+
+        player2.SetKeys(player2ListMovEvents);
 
         field = new(new(new(50, 50), new(GameBounds.X - 100, GameBounds.Y - 100)), Color.White);
 
@@ -63,6 +99,13 @@ public class GamePhysicTest : Game
         updateDrawables.Add(field);
         updateDrawables.Add(ball);
         updateDrawables.Add(instantiateBallLight);
+
+        if (isLan)
+        {
+            Task.Run(
+                async () => await Connection.Connect()
+            ).Wait();
+        }
 
         base.Initialize();
     }
@@ -102,9 +145,48 @@ public class GamePhysicTest : Game
             tempUpdateDrawables.Clear();
         }
 
-        updateDrawables.ForEach(x => x.Update(gameTime));
+        if (isLan && isMaster)
+        {
+            Connection.FieldInfosDto.player1Pos = new float[] { player1.Bounds.Position.X, player1.Bounds.Position.Y };
+            Connection.FieldInfosDto.player2Pos = new float[] { player2.Bounds.Position.X, player2.Bounds.Position.Y };
+            Connection.FieldInfosDto.ballPos = new float[] { ball.Bounds.Position.X, ball.Bounds.Position.Y };
+            if (instantiateBallLight.ballLight != null)
+                Connection.FieldInfosDto.ballLightPos = new float[] { instantiateBallLight.ballLight.Bounds.Position.X,
+                    instantiateBallLight.ballLight.Bounds.Position.Y };
+
+            updateDrawables.ForEach(x => x.Update(gameTime));
+            Task.Run(async () =>
+            {
+                await Connection.SendFieldInfosToServer();
+            }).Wait();
+        }
+        else if (isLan && !isMaster)
+        {
+            player1.Bounds.Position = new Vector2(Connection.FieldInfosDto.player1Pos[0], Connection.FieldInfosDto.player1Pos[1]);
+            player2.Bounds.Position = new Vector2(Connection.FieldInfosDto.player2Pos[0], Connection.FieldInfosDto.player2Pos[1]);
+            ball.Bounds.Position = new Vector2(Connection.FieldInfosDto.ballPos[0], Connection.FieldInfosDto.ballPos[1]);
+
+            if (instantiateBallLight.ballLight != null)
+                instantiateBallLight.ballLight.Bounds.Position = new Vector2(Connection.FieldInfosDto.ballLightPos[0], Connection.FieldInfosDto.ballLightPos[1]);
+            else {
+                instantiateBallLight.Update(gameTime);
+            }
+
+            KeyboardState keyboardState = Keyboard.GetState();
+            Connection.KeyP2InfoDto.player2Keys = new bool[]
+            {
+                keyboardState.IsKeyDown(Keys.Up),
+                keyboardState.IsKeyDown(Keys.Down),
+                keyboardState.IsKeyDown(Keys.Left),
+                keyboardState.IsKeyDown(Keys.Right),
+                keyboardState.IsKeyDown(Keys.NumPad0)
+            };
+            Task.Run(async () => await Connection.SendKeyInfosToServer()).Wait();
+        }
 
         _collisionComponent.Update(gameTime);
+
+        // Connection.SendFieldInfosToServer(FieldInfosDto).RunSynchronously();
 
         // TODO: Add your update logic here
 

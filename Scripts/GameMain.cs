@@ -2,9 +2,9 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended;
 using MonoGame.Extended.Screens;
+using System;
 
 namespace BattleBall;
 
@@ -12,6 +12,7 @@ public class GameMain : Game
 {
     public GraphicsDeviceManager _graphics;
     public SpriteBatch SpriteBatch;
+
     public Size GameBound = new(1440, 1024);
     public readonly GameSceneManager gameSceneManager;
     public Mix mix;
@@ -65,5 +66,14 @@ public class GameMain : Game
         // TODO: Add your drawing code here
 
         base.Draw(gameTime);
+    }
+
+    protected override void OnExiting(object sender, ExitingEventArgs args)
+    {
+        if (GameStatics.process != null) {
+            GameStatics.process.Kill();
+        }
+
+        base.OnExiting(sender, args);
     }
 }

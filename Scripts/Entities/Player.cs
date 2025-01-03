@@ -39,7 +39,7 @@ namespace BattleBall.Scripts.Entities
 
         // Others
         public Color color;
-        private Dictionary<PlayerKeys, Keys> playerKeys = new();
+        public Dictionary<PlayerKeys, Func<KeyboardState, bool>> playerKeys = new();
         public bool[] isColliderBorderField = new bool[4]; // TOP, BOTTOM, LEFT, RIGHT
         public bool isVisible { get; set; } = true;
         public bool isPlayer1;
@@ -92,13 +92,9 @@ namespace BattleBall.Scripts.Entities
             }
         }
 
-        public void SetKeys(Keys up, Keys down, Keys left, Keys right, Keys dash)
+        public void SetKeys(Dictionary<PlayerKeys, Func<KeyboardState, bool>> events)
         {
-            playerKeys.Add(PlayerKeys.Up, up);
-            playerKeys.Add(PlayerKeys.Down, down);
-            playerKeys.Add(PlayerKeys.Left, left);
-            playerKeys.Add(PlayerKeys.Right, right);
-            playerKeys.Add(PlayerKeys.Dash, dash);
+            playerKeys = events;
         }
 
         void DrawHeath(SpriteBatch spriteBatch)
@@ -130,7 +126,6 @@ namespace BattleBall.Scripts.Entities
             UpdateDurations(gameTime);
             KeysPress();
             UpdateMovement(gameTime);
-
         }
 
         void UpdateDurations(GameTime gameTime)
@@ -209,11 +204,11 @@ namespace BattleBall.Scripts.Entities
 
         void HandleVerticalMovement(KeyboardState keyboardState)
         {
-            if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Up]) && !isColliderBorderField[0])
+            if (playerKeys[PlayerKeys.Up](keyboardState) && !isColliderBorderField[0])
             {
                 velocity.Y = -Physics.DEFAULT_VELOCITY_PLAYER;
             }
-            else if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Down]) && !isColliderBorderField[1])
+            else if (playerKeys[PlayerKeys.Down](keyboardState) && !isColliderBorderField[1])
             {
                 velocity.Y = Physics.DEFAULT_VELOCITY_PLAYER;
             }
@@ -226,11 +221,11 @@ namespace BattleBall.Scripts.Entities
 
         void HandleHorizontalMovement(KeyboardState keyboardState)
         {
-            if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Left]) && !isColliderBorderField[2])
+            if (playerKeys[PlayerKeys.Left](keyboardState) && !isColliderBorderField[2])
             {
                 velocity.X = -Physics.DEFAULT_VELOCITY_PLAYER;
             }
-            else if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Right]) && !isColliderBorderField[3])
+            else if (playerKeys[PlayerKeys.Right](keyboardState) && !isColliderBorderField[3])
             {
                 velocity.X = Physics.DEFAULT_VELOCITY_PLAYER;
             }
@@ -243,7 +238,7 @@ namespace BattleBall.Scripts.Entities
 
         void HandleDash(KeyboardState keyboardState)
         {
-            if (keyboardState.IsKeyDown(playerKeys[PlayerKeys.Dash]) && timeWaitDash <= 0)
+            if (playerKeys[PlayerKeys.Dash](keyboardState) && timeWaitDash <= 0)
             {
                 if (velocitydash.Length() == 0 && velocity != Vector2.Zero)
                 {

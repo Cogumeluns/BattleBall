@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BattleBall.Scripts.Entities;
+using BattleBall.Scripts.Enum;
 using BattleBall.Scripts.Events;
 using BattleBall.Scripts.Interfaces;
 using Microsoft.Xna.Framework;
@@ -22,6 +23,7 @@ namespace BattleBall.Scripts.Scene
         public bool isDisposed { get; private set; }
 
         private CollisionComponent _collisionComponent;
+
         List<IUpdateDrawable> _elements = new();
         List<IUpdateDrawable> _tempElements = new();
 
@@ -43,10 +45,22 @@ namespace BattleBall.Scripts.Scene
             eventGameMode = new(this);
 
             player1 = new(new(new(width / 4, heigth / 2), 30), new(81, 125, 201), true);
-            player1.SetKeys(Keys.W, Keys.S, Keys.A, Keys.D, Keys.Q);
+            player1.SetKeys(new Dictionary<PlayerKeys, Func<KeyboardState, bool>>() {
+                    { PlayerKeys.Up, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.W) },
+                    { PlayerKeys.Down, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.S) },
+                    { PlayerKeys.Left, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.A) },
+                    { PlayerKeys.Right, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.D) },
+                    { PlayerKeys.Dash, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.Space) }
+                });
 
             player2 = new(new(new(width - (width / 4), heigth / 2), 30), new(255, 106, 106), false);
-            player2.SetKeys(Keys.Up, Keys.Down, Keys.Left, Keys.Right, Keys.E);
+            player2.SetKeys(new Dictionary<PlayerKeys, Func<KeyboardState, bool>>() {
+                { PlayerKeys.Up, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.Up) },
+                { PlayerKeys.Down, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.Down) },
+                { PlayerKeys.Left, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.Left) },
+                { PlayerKeys.Right, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.Right) },
+                { PlayerKeys.Dash, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.NumPad0) }
+            });
 
             field = new(new(new(50, 50), new(width - 100, heigth - 100)), Color.White);
 

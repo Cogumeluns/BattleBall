@@ -44,7 +44,7 @@ namespace BattleBall.Scripts.Entities
             UpdateMovement(deltaTime);
             velocity = DecreaseVelocity(deltaTime, velocity, false);
             velocityField = DecreaseVelocity(deltaTime, velocityField, true);
-        }
+        } 
 
         void UpdateMovement(float deltaTime)
         {
@@ -85,6 +85,7 @@ namespace BattleBall.Scripts.Entities
 
         Vector2 GetNormalizedDirection(Vector2 vector)
         {
+            if (float.IsNaN(vector.X) || float.IsNaN(vector.Y)) return Vector2.Zero;
             return new Vector2(Math.Sign(vector.X), Math.Sign(vector.Y));
         }
 
