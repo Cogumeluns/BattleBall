@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using BattleBall.Scripts.Entities;
 using BattleBall.Scripts.Enum;
@@ -15,7 +14,7 @@ namespace BattleBall;
 
 public class GamePhysicTest : Game
 {
-    public Connection Connection = new Connection();
+    public Connection Connection = new Connection(new GameMain());
     bool isLan = true;
     bool isMaster = true;
 
@@ -49,7 +48,7 @@ public class GamePhysicTest : Game
     protected override void Initialize()
     {
         // TODO: Add your initialization logic here
-        player1 = new(new(new(GameBounds.X / 4, GameBounds.Y / 2), 30), Color.Blue);
+        player1 = new(new(new(GameBounds.X / 4, GameBounds.Y / 2), 30), Color.Blue, true);
         var player1ListMovEvents = new Dictionary<PlayerKeys, Func<KeyboardState, bool>>()
         {
             { PlayerKeys.Up, (KeyboardState keyboardState) => keyboardState.IsKeyDown(Keys.W) },
@@ -60,7 +59,7 @@ public class GamePhysicTest : Game
         }; 
         player1.SetKeys(player1ListMovEvents);
 
-        player2 = new(new(new(GameBounds.X - (GameBounds.X / 4), GameBounds.Y / 2), 30), Color.Red);
+        player2 = new(new(new(GameBounds.X - (GameBounds.X / 4), GameBounds.Y / 2), 30), Color.Red, false);
         var player2ListMovEvents = new Dictionary<PlayerKeys, Func<KeyboardState, bool>>();
         if (isLan && isMaster)
         {

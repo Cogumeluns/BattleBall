@@ -15,13 +15,16 @@ namespace BattleBall.Scripts.Entities
     {
         const float DEFAULT_DECRESS_VELOCITY_BALL = 0.4f;
         const float RADIUS = 3;
+
         // ICollisionActor
         public IShapeF Bounds { get; set; }
         // IUpdateDrawable -> IBaseDisposable
         public bool isDisposed { get; private set; } = false;
-        public Color color;
+
         public Vector2 velocity = Vector2.Zero;
         public Vector2 velocityField = Vector2.Zero;
+        public Color color;
+        public bool isVisible { get; set; } = true;
 
         public Ball(CircleF circle, Color color)
         {
@@ -82,6 +85,7 @@ namespace BattleBall.Scripts.Entities
 
         Vector2 GetNormalizedDirection(Vector2 vector)
         {
+            if (float.IsNaN(vector.X) || float.IsNaN(vector.Y)) return Vector2.Zero;
             return new Vector2(Math.Sign(vector.X), Math.Sign(vector.Y));
         }
 

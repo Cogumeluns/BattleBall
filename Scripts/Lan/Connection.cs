@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System;
 using System.Diagnostics;
+using BattleBall;
 
 public class Connection
 {
@@ -11,11 +12,17 @@ public class Connection
 
     public FieldInfosDto FieldInfosDto { get; set; } = new();
     public KeyP2InfoDto KeyP2InfoDto { get; set; } = new();
+    public GameMain Game { get; set; }
 
-    public async Task Connect()
+    public Connection(GameMain gameMain)
+    {
+        Game = gameMain;
+    }
+
+    public async Task<bool> Connect(string localPath = null)
     {
         hubConnection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5000/GameHub")
+            .WithUrl(localPath)
             .Build();
 
         // Handle the class received from the server
@@ -29,9 +36,21 @@ public class Connection
             this.KeyP2InfoDto = keyP2Info;
         });
 
+        hubConnection.On("ReceiveClientConnectedInfo", () => {
+            GameStatics.isConnectedClient = true;
+        });
+
+        hubConnection.On("ReceiveOpenLanMode", () => {
+            Game.gameSceneManager.LoadScene(global::Scene.GAME_MODE_LAN);
+        });
+
+        hubConnection.On("ReceiveOpenMainMenu", () => {
+            Game.gameSceneManager.LoadScene(global::Scene.MAIN_MENU);
+        });
+
         await hubConnection.StartAsync();
         Console.WriteLine("Connection established");
-        Console.ReadLine();
+        return true;
     }
 
     public async Task SendFieldInfosToServer()
@@ -43,4 +62,20 @@ public class Connection
     {
         await hubConnection.InvokeAsync("SendKeysToServer", KeyP2InfoDto);
     }
+
+    public async Task SendClientConnectedInfo()
+    {
+        await hubConnection.InvokeAsync("SendClientConnectedInfo");
+    }
+
+    public async Task SendOpenLanMode()
+    {
+        await hubConnection.InvokeAsync("SendOpenLanMode");
+    }
+
+    public async Task SendOpenMainMenu()
+    {
+        await hubConnection.InvokeAsync("SendOpenMainMenu");
+    }
+
 }

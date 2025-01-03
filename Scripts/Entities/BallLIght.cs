@@ -10,13 +10,17 @@ namespace BattleBall.Scripts.Entities
 {
     public class BallLight : ICollisionActor, IUpdateDrawable
     {
+        // ICollisionActor
         public IShapeF Bounds { get; set; }
+        // IUpdateDrawable
         public bool isDisposed { get; private set; }
-        public float radius;
+        // IUpdateDrawable
+        public bool isVisible { get; set; } = true;
         public Color color;
         public List<Player> players = new();
         ControllerBallLight controllerBallLight;
         int damage = 1;
+        public float radius;
 
         public BallLight(CircleF circle, Color color, List<Player> players, ControllerBallLight instantiateBallLight)
         {
@@ -29,11 +33,11 @@ namespace BattleBall.Scripts.Entities
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawCircle((CircleF)Bounds, Physics.SIDES, color, 3);
+            CircleF circle = (CircleF)Bounds;
+            spriteBatch.DrawCircle(circle, Physics.SIDES, color, circle.Radius);
         }
-        public void Update(GameTime gameTime)
-        {
-        }
+
+        // ICollisionActor
         public void OnCollision(CollisionEventArgs collisionInfo)
         {
             if (collisionInfo.Other is Ball ball)
@@ -78,13 +82,16 @@ namespace BattleBall.Scripts.Entities
             {
                 damage = 0; // Previne múltiplas reduções de vida
 
-                if (ball.color == Color.Blue)
+                if (players[0] != null && players[1] != null)
                 {
-                    HandlePlayerDamage(players[1]);
-                }
-                else if (ball.color == Color.Red)
-                {
-                    HandlePlayerDamage(players[0]);
+                    if (ball.color == players[0].color)
+                    {
+                        HandlePlayerDamage(players[1]);
+                    }
+                    else if (ball.color == players[1].color)
+                    {
+                        HandlePlayerDamage(players[0]);
+                    }
                 }
             }
         }
@@ -101,5 +108,7 @@ namespace BattleBall.Scripts.Entities
             if (isDisposed) return;
             isDisposed = true;
         }
+
+        public void Update(GameTime gameTime) { }
     }
 }

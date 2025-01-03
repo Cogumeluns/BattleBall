@@ -19,21 +19,47 @@ namespace BattleBall.Scripts.Entities
         public IShapeF Bounds { get; set; }
         // IUpdateDrawable -> IBaseDisposable
         public bool isDisposed { get; private set; } = false;
-        public Color color;
-        public Dictionary<PlayerKeys, Func<KeyboardState, bool>> playerKeys = new();
+
+        // Lives
+        public int Lives { get; set; }
+        public Vector2[] positionLives = new Vector2[3];
+
+        // Dash Icon Use
+        public Vector2 positionTimerWaitDash = Vector2.Zero;
+
+        // Moviment
         public Vector2 velocitydash = Vector2.Zero;
         public Vector2 velocity = Vector2.Zero;
         public Vector2 pushBackIntensity = Vector2.Zero;
-        public int Lives { get; set; }
-        public float timeDash = 0;
-        public float timePushBackDuration = 0;
-        public bool[] isColliderBorderField = new bool[4]; // TOP, BOTTOM, LEFT, RIGHT
 
-        public Player(CircleF circle, Color color)
+        // Timers
+        public float timeDash = 0;
+        public float timeWaitDash = 0;
+        public float timePushBackDuration = 0;
+
+        // Others
+        public Color color;
+        public Dictionary<PlayerKeys, Func<KeyboardState, bool>> playerKeys = new();
+        public bool[] isColliderBorderField = new bool[4]; // TOP, BOTTOM, LEFT, RIGHT
+        public bool isVisible { get; set; } = true;
+        public bool isPlayer1;
+
+        public Player(CircleF circle, Color color, bool isPlayer1)
         {
             Bounds = circle;
             this.color = color;
             Lives = 3;
+            this.isPlayer1 = isPlayer1;
+            if (isPlayer1)
+            {
+                SetPositionHeath(new(60, 25), 45);
+            }
+            else
+            {
+                SetPositionHeath(new(1285, 25), 45);
+            }
+
+            SetPositionDash();
         }
 
         public void Damage(int damage)
@@ -46,14 +72,52 @@ namespace BattleBall.Scripts.Entities
             }
         }
 
+        public void SetPositionHeath(Vector2 vector2, float someX)
+        {
+            for (int i = 0; i < Lives; i++)
+            {
+                positionLives[i] = new(vector2.X + someX * i, vector2.Y);
+            }
+        }
+
+        public void SetPositionDash()
+        {
+            if (isPlayer1)
+            {
+                positionTimerWaitDash = new(650, 25);
+            }
+            else
+            {
+                positionTimerWaitDash = new(900, 25);
+            }
+        }
+
         public void SetKeys(Dictionary<PlayerKeys, Func<KeyboardState, bool>> events)
         {
             playerKeys = events;
         }
 
+        void DrawHeath(SpriteBatch spriteBatch)
+        {
+            CircleF circle;
+            for (int i = 0; i < Lives; i++)
+            {
+                circle = new(positionLives[i], 15);
+                spriteBatch.DrawCircle(circle, Physics.SIDES, color, circle.Radius);
+            }
+        }
+
+        void DrawDash(SpriteBatch spriteBatch)
+        {
+            CircleF circle = new(positionTimerWaitDash, 15);
+            spriteBatch.DrawCircle(circle, Physics.SIDES, timeWaitDash <= 0 ? color : Color.Black, circle.Radius);
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
             CircleF circle = (CircleF)Bounds;
+            DrawHeath(spriteBatch);
+            DrawDash(spriteBatch);
             spriteBatch.DrawCircle(circle, Physics.SIDES, color, circle.Radius);
         }
 
@@ -70,6 +134,7 @@ namespace BattleBall.Scripts.Entities
 
             UpdatePushBackDuration(deltaTime);
             UpdateDashDuration(deltaTime);
+            UpdateDashWait(deltaTime);
         }
 
         void UpdatePushBackDuration(float deltaTime)
@@ -96,6 +161,19 @@ namespace BattleBall.Scripts.Entities
                 {
                     timeDash = 0;
                     velocitydash = Vector2.Zero;
+                }
+            }
+        }
+
+        void UpdateDashWait(float deltaTime)
+        {
+            if (timeWaitDash > 0)
+            {
+                timeWaitDash -= deltaTime;
+
+                if (timeWaitDash <= 0)
+                {
+                    timeWaitDash = 0;
                 }
             }
         }
@@ -160,13 +238,14 @@ namespace BattleBall.Scripts.Entities
 
         void HandleDash(KeyboardState keyboardState)
         {
-            if (playerKeys[PlayerKeys.Dash](keyboardState))
+            if (playerKeys[PlayerKeys.Dash](keyboardState) && timeWaitDash <= 0)
             {
                 if (velocitydash.Length() == 0 && velocity != Vector2.Zero)
                 {
                     Vector2 normalized = Vector2.Normalize(velocity);
                     velocitydash = normalized * Physics.DEFAULT_VELOCITY_DASH;
                     timeDash = Physics.DEFAULT_TIME_DASH_DURATION;
+                    timeWaitDash = Physics.DEFAULT_TIME_DASH_WAIT;
                 }
             }
         }

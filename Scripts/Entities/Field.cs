@@ -13,28 +13,25 @@ namespace BattleBall.Scripts.Entities
 {
     public class Field : ICollisionActor, IUpdateDrawable
     {
+        // IUpdateDrawable
+        public bool isVisible { get; set; } = true;
+        // IUpdateDrawable
+        public bool isDisposed { get; private set; } = false;
         private const int DISTANCE_TO_BOUND = 5;
         // ICollisionActor
         public IShapeF Bounds { get; set; }
-        // IUpdateDrawable -> IBaseDisposable
-        public bool isDisposed { get; private set; } = false;
         public Color color;
-        public float thickness;
+        public float thickness = 5;
 
         public Field(RectangleF rectangle, Color color)
         {
             Bounds = rectangle;
             this.color = color;
-            thickness = 5;
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawRectangle((RectangleF)Bounds, color, 5);
-        }
-
-        public void Update(GameTime gameTime)
-        {
+            spriteBatch.DrawRectangle((RectangleF)Bounds, color, thickness);
         }
 
         public void OnCollision(CollisionEventArgs collisionInfo)
@@ -167,11 +164,8 @@ namespace BattleBall.Scripts.Entities
             return velocityField;
         }
 
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+        public void Dispose() { }
+        public void Update(GameTime gameTime) { }
     }
 }
 
